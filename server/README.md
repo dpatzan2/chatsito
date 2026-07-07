@@ -18,7 +18,9 @@ del servidor (`[DEV SMS] ...`).
 
 ## Protocolo WebSocket v1
 
-Conexión: `ws://localhost:3000/ws?token=<accessJWT>` (cierra con 4001 si el token es inválido).
+Conexión: `ws://localhost:3000/ws` con el access JWT en el subprotocolo —
+`new WebSocket(url, ['bearer', accessJWT])` (Dart: `WebSocket.connect(url, protocols: ['bearer', jwt])`).
+El token nunca va en la URL (las URLs acaban en logs). Cierra con 4001 si es inválido.
 
 Cliente→servidor: `{"v":1,"op":"...","seq":N,"d":{...}}` — todo op se responde con
 `sys.ack {seq,...}` o `sys.error {seq,code,message}`.

@@ -45,7 +45,7 @@ it('sys.resume returns messages missed while offline, skipping deleted ones', as
   });
   await deleteMessage(ctx.db, m2.id, alice.id);
 
-  const b = wsClient(`${base}?token=${bob.access}`);
+  const b = wsClient(base, bob.access);
   await b.open;
   b.send('sys.resume', 1, { targets: [{ conversationId: convId, lastMsgId: m0.id }] });
   expect((await b.next()).op).toBe('sys.ack');
@@ -61,7 +61,7 @@ it('sys.resume returns messages missed while offline, skipping deleted ones', as
 it('sys.resume rejects conversations you are not a member of', async () => {
   const rows = await ctx.db.insert(users).values([{ phone: '50233333333' }]).returning();
   const tokens = tokenService(ctx.db, 's'.repeat(32));
-  const eve = wsClient(`${base}?token=${await tokens.signAccess(rows[0].id)}`);
+  const eve = wsClient(base, await tokens.signAccess(rows[0].id));
   await eve.open;
   eve.send('sys.resume', 1, { targets: [{ conversationId: convId, lastMsgId: '0' }] });
   const f = await eve.next();
