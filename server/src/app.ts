@@ -4,6 +4,7 @@ import { AppError } from './core/errors.js';
 import { authRoutes } from './api/auth.js';
 import { meRoutes } from './api/me.js';
 import { conversationRoutes } from './api/conversations.js';
+import { communityRoutes } from './api/communities.js';
 import { authGuard } from './api/guard.js';
 import { registerGateway } from './ws/gateway.js';
 import { Hub } from './ws/hub.js';
@@ -42,15 +43,16 @@ export function buildApp(deps: Deps): FastifyInstance {
     reply.status(404).send({ error: { code: 'NOT_FOUND', message: 'Route not found' } }),
   );
 
+  const hub = new Hub();
+  app.decorate('hub', hub);
+
   authRoutes(app, deps);
   app.register(async (scope) => {
     scope.addHook('onRequest', authGuard(deps.tokens));
     meRoutes(scope, deps);
     conversationRoutes(scope, deps);
+    communityRoutes(scope, deps, hub);
   });
-
-  const hub = new Hub();
-  app.decorate('hub', hub);
   app.register(async (scope) => registerGateway(scope, deps, hub));
 
   return app;
