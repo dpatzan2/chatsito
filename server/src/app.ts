@@ -5,6 +5,14 @@ import { authRoutes } from './api/auth.js';
 import { meRoutes } from './api/me.js';
 import { conversationRoutes } from './api/conversations.js';
 import { authGuard } from './api/guard.js';
+import { registerGateway } from './ws/gateway.js';
+import { Hub } from './ws/hub.js';
+
+declare module 'fastify' {
+  interface FastifyInstance {
+    hub: Hub;
+  }
+}
 import type { Db } from './db/client.js';
 import type { SmsSender } from './auth/sms.js';
 import type { Tokens } from './auth/tokens.js';
@@ -40,6 +48,10 @@ export function buildApp(deps: Deps): FastifyInstance {
     meRoutes(scope, deps);
     conversationRoutes(scope, deps);
   });
+
+  const hub = new Hub();
+  app.decorate('hub', hub);
+  app.register(async (scope) => registerGateway(scope, deps, hub));
 
   return app;
 }
