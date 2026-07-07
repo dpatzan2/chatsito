@@ -15,6 +15,13 @@
       "when": 1783399372791,
       "tag": "0001_fast_storm",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1783430340778,
+      "tag": "0002_bouncy_union_jack",
+      "breakpoints": true
     }
   ]
 }
