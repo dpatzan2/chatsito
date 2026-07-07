@@ -7,6 +7,9 @@ const Env = z.object({
   TWILIO_ACCOUNT_SID: z.string().optional(),
   TWILIO_AUTH_TOKEN: z.string().optional(),
   TWILIO_FROM: z.string().optional(),
+  LIVEKIT_URL: z.string().default('ws://localhost:7880'),
+  LIVEKIT_API_KEY: z.string().default('devkey'),
+  LIVEKIT_API_SECRET: z.string().default('secret'),
 });
 
 export type Config = z.infer<typeof Env>;

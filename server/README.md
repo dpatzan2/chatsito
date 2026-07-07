@@ -34,11 +34,20 @@ Servidor→cliente: `{"v":1,"op":"...","ts":ms,"d":{...}}`.
 | `typing.start` | `{conversationId}` | `sys.ack`; `typing {conversationId, userId}` al otro |
 | `read.mark` | `{conversationId, messageId}` | `sys.ack` |
 | `sys.resume` | `{targets:[{conversationId \| channelId, lastMsgId}]}` | `sys.ack` + `sys.resumed {targets:[{..., messages}]}` |
+| `voice.join` | `{channelId}` | `sys.ack` + `voice.ready {channelId, token, url, members}` (token LiveKit, 10 min) |
+| `voice.leave` | `{channelId}` | `sys.ack`; LiveKit confirma con webhook → `voice.state` |
+| `voice.mute` | `{channelId, userId, muted}` | `sys.ack` + `voice.state` (requiere `VOICE_MUTE_MEMBERS`) |
 
 Eventos de gestión de comunidades (servidor→cliente, a todos los miembros):
 `community.updated/deleted`, `channel.created/updated/deleted`,
 `role.created/updated/deleted`, `member.joined/left/updated`, `override.updated`.
 `permissions`/`allow`/`deny` viajan como string decimal (bitfield BigInt).
+
+Voz: el cliente conecta al SFU con el token de `voice.ready`
+(`livekit_client` en Flutter). La ocupación viaja en `voice.state
+{channelId, members:[{userId, muted}]}`, alimentada por los webhooks de
+LiveKit (`POST /livekit/webhook`). Sin `VOICE_SPEAK` el token es
+solo-escucha; *speaking* lo da el SDK de LiveKit directamente.
 
 Tipos de mensaje y su `content`: `text {text}`, `doc {name, size}`, `sticker {sticker}`,
 `image {}`, `video {}` (media real fuera de alcance por ahora).
