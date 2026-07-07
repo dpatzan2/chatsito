@@ -9,9 +9,10 @@ import {
 import {
   createRole, updateRole, deleteRole, assignRole, unassignRole, setOverride,
 } from '../community/roles.js';
+import { getChannelMessages } from '../community/channel-messages.js';
 import { PERM } from '../core/permissions.js';
 import { AppError } from '../core/errors.js';
-import { wireChannel, wireCommunity, wireRole } from '../core/wire.js';
+import { wireChannel, wireCommunity, wireMessage, wireRole } from '../core/wire.js';
 import type { Hub } from '../ws/hub.js';
 import type { Deps } from '../app.js';
 
@@ -95,9 +96,11 @@ export function communityRoutes(app: FastifyInstance, deps: Deps, hub: Hub): voi
       name: Name.optional(), position: z.number().int().min(0).optional(),
     }).parse(req.body);
     await requirePerm(deps.db, { communityId: id, userId: req.userId, perm: PERM.MANAGE_CHANNELS });
+    // verificar pertenencia ANTES de mutar: chId podría ser de otra comunidad (IDOR)
+    const [existing] = await deps.db.select().from(channels).where(eq(channels.id, chId));
+    if (!existing || existing.communityId !== id) throw new AppError('NOT_FOUND', 'Channel not found');
     const [channel] = await deps.db.update(channels).set(patch)
       .where(eq(channels.id, chId)).returning();
-    if (!channel || channel.communityId !== id) throw new AppError('NOT_FOUND', 'Channel not found');
     await broadcast(id, 'channel.updated', wireChannel(channel));
     return wireChannel(channel);
   });
@@ -105,8 +108,10 @@ export function communityRoutes(app: FastifyInstance, deps: Deps, hub: Hub): voi
   app.delete('/communities/:id/channels/:chId', async (req, reply) => {
     const { id, chId } = z.object({ id: z.uuid(), chId: z.uuid() }).parse(req.params);
     await requirePerm(deps.db, { communityId: id, userId: req.userId, perm: PERM.MANAGE_CHANNELS });
-    const [channel] = await deps.db.delete(channels).where(eq(channels.id, chId)).returning();
-    if (!channel || channel.communityId !== id) throw new AppError('NOT_FOUND', 'Channel not found');
+    // verificar pertenencia ANTES de borrar: chId podría ser de otra comunidad (IDOR)
+    const [existing] = await deps.db.select().from(channels).where(eq(channels.id, chId));
+    if (!existing || existing.communityId !== id) throw new AppError('NOT_FOUND', 'Channel not found');
+    await deps.db.delete(channels).where(eq(channels.id, chId));
     await broadcast(id, 'channel.deleted', { id: chId, communityId: id });
     return reply.status(204).send();
   });
@@ -160,6 +165,16 @@ export function communityRoutes(app: FastifyInstance, deps: Deps, hub: Hub): voi
     await removeMember(deps.db, p.id, req.userId, p.userId);
     hub.sendTo(memberIds, 'member.left', { communityId: p.id, userId: p.userId });
     return reply.status(204).send();
+  });
+
+  app.get('/channels/:id/messages', async (req) => {
+    const { id } = z.object({ id: z.uuid() }).parse(req.params);
+    const { before, limit } = z.object({
+      before: z.string().optional(),
+      limit: z.coerce.number().int().positive().optional(),
+    }).parse(req.query);
+    const rows = await getChannelMessages(deps.db, id, req.userId, { before, limit });
+    return { messages: rows.map(wireMessage) };
   });
 
   app.put('/channels/:id/overrides/:roleId', async (req) => {

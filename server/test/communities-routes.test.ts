@@ -126,6 +126,32 @@ it('override PUT and kick DELETE work end to end', async () => {
   expect(gone.statusCode).toBe(404);
 });
 
+it('cannot mutate channels of another community via mismatched ids (IDOR)', async () => {
+  const mine = await makeCommunity('Mia');
+  // comunidad ajena: member es owner (tiene MANAGE_CHANNELS en la suya, no en la de owner)
+  const foreign = (await app.inject({
+    method: 'POST', url: '/communities', headers: auth(member), payload: { name: 'Ajena' },
+  })).json() as { id: string; channels: Array<{ id: string }> };
+  const foreignChannel = foreign.channels[0].id;
+
+  // owner tiene perms en `mine` pero el canal es de `foreign`: debe ser 404 sin mutar
+  const patched = await app.inject({
+    method: 'PATCH', url: `/communities/${mine.id}/channels/${foreignChannel}`,
+    headers: auth(owner), payload: { name: 'pwned' },
+  });
+  expect(patched.statusCode).toBe(404);
+  const deleted = await app.inject({
+    method: 'DELETE', url: `/communities/${mine.id}/channels/${foreignChannel}`,
+    headers: auth(owner),
+  });
+  expect(deleted.statusCode).toBe(404);
+  // el canal ajeno sigue intacto
+  const still = (await app.inject({
+    method: 'GET', url: `/communities/${foreign.id}`, headers: auth(member),
+  })).json() as { channels: Array<{ id: string; name: string }> };
+  expect(still.channels[0]).toMatchObject({ id: foreignChannel, name: 'general' });
+});
+
 it('DELETE community is owner-only', async () => {
   const c = await makeCommunity('Borrable');
   await join(c.id, member);

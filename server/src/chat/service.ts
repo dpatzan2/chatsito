@@ -1,8 +1,10 @@
 import { ulid } from 'ulid';
 import { and, desc, eq, gt, isNull, lt, ne, or, sql } from 'drizzle-orm';
-import { conversations, messages, readStates, users } from '../db/schema.js';
+import { channels, conversations, messages, readStates, users } from '../db/schema.js';
 import { AppError } from '../core/errors.js';
+import { PERM } from '../core/permissions.js';
 import { publicUser } from '../core/wire.js';
+import { requirePerm } from '../community/service.js';
 import type { Db } from '../db/client.js';
 
 type Conversation = typeof conversations.$inferSelect;
@@ -58,11 +60,19 @@ export async function getMessages(
 }
 
 export async function deleteMessage(db: Db, messageId: string, userId: string): Promise<Message> {
-  const [msg] = await db.update(messages)
-    .set({ deletedAt: new Date() })
-    .where(and(eq(messages.id, messageId), eq(messages.authorId, userId), isNull(messages.deletedAt)))
-    .returning();
-  if (!msg) throw new AppError('NOT_FOUND', 'Message not found');
+  const [existing] = await db.select().from(messages)
+    .where(and(eq(messages.id, messageId), isNull(messages.deletedAt)));
+  if (!existing) throw new AppError('NOT_FOUND', 'Message not found');
+  if (existing.authorId !== userId) {
+    if (!existing.channelId) throw new AppError('NOT_FOUND', 'Message not found');
+    const [channel] = await db.select().from(channels).where(eq(channels.id, existing.channelId));
+    await requirePerm(db, {
+      communityId: channel.communityId, userId,
+      perm: PERM.MANAGE_MESSAGES, channelId: existing.channelId,
+    });
+  }
+  const [msg] = await db.update(messages).set({ deletedAt: new Date() })
+    .where(eq(messages.id, messageId)).returning();
   return msg;
 }
 

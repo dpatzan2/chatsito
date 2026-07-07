@@ -16,10 +16,14 @@ const CONTENT: Record<string, z.ZodType> = {
 };
 
 export const MsgSendInput = z.object({
-  conversationId: z.uuid(),
+  conversationId: z.uuid().optional(),
+  channelId: z.uuid().optional(),
   type: z.enum(['text', 'image', 'video', 'doc', 'sticker']),
   content: z.record(z.string(), z.unknown()),
 }).superRefine((val, ctx) => {
+  if (!val.conversationId === !val.channelId) {
+    ctx.addIssue({ code: 'custom', message: 'exactly one of conversationId or channelId' });
+  }
   if (!CONTENT[val.type].safeParse(val.content).success) {
     ctx.addIssue({ code: 'custom', message: `invalid content for type ${val.type}` });
   }
