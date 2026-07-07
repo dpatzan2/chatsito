@@ -1,6 +1,7 @@
 import Fastify, { type FastifyInstance } from 'fastify';
 import { ZodError } from 'zod';
 import { AppError } from './core/errors.js';
+import { authRoutes } from './api/auth.js';
 import type { Db } from './db/client.js';
 import type { SmsSender } from './auth/sms.js';
 import type { Tokens } from './auth/tokens.js';
@@ -29,6 +30,8 @@ export function buildApp(deps: Deps): FastifyInstance {
   app.setNotFoundHandler((_req, reply) =>
     reply.status(404).send({ error: { code: 'NOT_FOUND', message: 'Route not found' } }),
   );
+
+  authRoutes(app, deps);
 
   return app;
 }
