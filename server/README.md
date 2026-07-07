@@ -29,11 +29,16 @@ Servidor→cliente: `{"v":1,"op":"...","ts":ms,"d":{...}}`.
 | Op cliente | d | Respuesta / eventos |
 |---|---|---|
 | `sys.ping` | — | `sys.ack` |
-| `msg.send` | `{conversationId, type, content}` | `sys.ack {id}` + `msg.new` a ambos miembros |
-| `msg.delete` | `{id}` | `sys.ack` + `msg.deleted {id, conversationId}` |
+| `msg.send` | `{conversationId \| channelId, type, content}` | `sys.ack {id}` + `msg.new` a los destinatarios (canal: miembros con `VIEW_CHANNEL`) |
+| `msg.delete` | `{id}` | `sys.ack` + `msg.deleted {id, conversationId \| channelId}` |
 | `typing.start` | `{conversationId}` | `sys.ack`; `typing {conversationId, userId}` al otro |
 | `read.mark` | `{conversationId, messageId}` | `sys.ack` |
-| `sys.resume` | `{targets:[{conversationId, lastMsgId}]}` | `sys.ack` + `sys.resumed {targets:[{conversationId, messages}]}` |
+| `sys.resume` | `{targets:[{conversationId \| channelId, lastMsgId}]}` | `sys.ack` + `sys.resumed {targets:[{..., messages}]}` |
+
+Eventos de gestión de comunidades (servidor→cliente, a todos los miembros):
+`community.updated/deleted`, `channel.created/updated/deleted`,
+`role.created/updated/deleted`, `member.joined/left/updated`, `override.updated`.
+`permissions`/`allow`/`deny` viajan como string decimal (bitfield BigInt).
 
 Tipos de mensaje y su `content`: `text {text}`, `doc {name, size}`, `sticker {sticker}`,
 `image {}`, `video {}` (media real fuera de alcance por ahora).
