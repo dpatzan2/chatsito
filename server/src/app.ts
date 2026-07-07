@@ -8,6 +8,8 @@ import { communityRoutes } from './api/communities.js';
 import { authGuard } from './api/guard.js';
 import { registerGateway } from './ws/gateway.js';
 import { Hub } from './ws/hub.js';
+import { VoiceStates } from './voice/state.js';
+import type { LiveKitCfg, RoomApi } from './voice/livekit.js';
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -22,6 +24,8 @@ export interface Deps {
   db: Db;
   sms: SmsSender;
   tokens: Tokens;
+  lk?: LiveKitCfg;   // default: DEV_LIVEKIT (modo --dev del compose)
+  lkApi?: RoomApi;   // inyectable en tests
 }
 
 export function buildApp(deps: Deps): FastifyInstance {
@@ -45,6 +49,7 @@ export function buildApp(deps: Deps): FastifyInstance {
 
   const hub = new Hub();
   app.decorate('hub', hub);
+  const voice = new VoiceStates();
 
   authRoutes(app, deps);
   app.register(async (scope) => {
@@ -53,7 +58,7 @@ export function buildApp(deps: Deps): FastifyInstance {
     conversationRoutes(scope, deps);
     communityRoutes(scope, deps, hub);
   });
-  app.register(async (scope) => registerGateway(scope, deps, hub));
+  app.register(async (scope) => registerGateway(scope, deps, hub, voice));
 
   return app;
 }

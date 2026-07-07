@@ -5,9 +5,12 @@ import { AppError, type ErrorCode } from '../core/errors.js';
 import { ClientFrame, serverFrame } from './protocol.js';
 import { handlers, type HandlerCtx } from './handlers.js';
 import type { Hub } from './hub.js';
+import type { VoiceStates } from '../voice/state.js';
 import type { Deps } from '../app.js';
 
-export async function registerGateway(app: FastifyInstance, deps: Deps, hub: Hub): Promise<void> {
+export async function registerGateway(
+  app: FastifyInstance, deps: Deps, hub: Hub, voice: VoiceStates,
+): Promise<void> {
   await app.register(websocket, {
     options: { handleProtocols: () => 'bearer' },
   });
@@ -34,7 +37,7 @@ export async function registerGateway(app: FastifyInstance, deps: Deps, hub: Hub
         seq = frame.seq;
         const handler = handlers[frame.op];
         if (!handler) throw new AppError('VALIDATION', `unknown op: ${frame.op}`);
-        const ctx: HandlerCtx = { deps, hub, userId, seq, socket };
+        const ctx: HandlerCtx = { deps, hub, voice, userId, seq, socket };
         await handler(ctx, frame.d);
       } catch (e) {
         let code: ErrorCode = 'INTERNAL';

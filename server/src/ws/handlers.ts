@@ -3,11 +3,13 @@ import { and, asc, eq, gt, isNull } from 'drizzle-orm';
 import type { WebSocket } from 'ws';
 import { assertMember, deleteMessage, markRead, sendMessage } from '../chat/service.js';
 import { sendChannelMessage, channelRecipients } from '../community/channel-messages.js';
-import { requirePerm } from '../community/service.js';
+import { memberPerms, requirePerm } from '../community/service.js';
 import { channels, conversations, messages } from '../db/schema.js';
 import { AppError } from '../core/errors.js';
-import { PERM } from '../core/permissions.js';
+import { PERM, can } from '../core/permissions.js';
 import { wireMessage } from '../core/wire.js';
+import { DEV_LIVEKIT, roomApi, signVoiceToken } from '../voice/livekit.js';
+import type { VoiceStates } from '../voice/state.js';
 import { serverFrame, MsgSendInput } from './protocol.js';
 import type { Hub } from './hub.js';
 import type { Deps } from '../app.js';
@@ -15,6 +17,7 @@ import type { Deps } from '../app.js';
 export interface HandlerCtx {
   deps: Deps;
   hub: Hub;
+  voice: VoiceStates;
   userId: string;
   seq: number;
   socket: WebSocket;
@@ -23,6 +26,16 @@ export interface HandlerCtx {
 export const ack = (socket: WebSocket, seq: number, extra: Record<string, unknown> = {}): void => {
   socket.send(serverFrame('sys.ack', { seq, ...extra }));
 };
+
+const lkOf = (deps: Deps) => deps.lk ?? DEV_LIVEKIT;
+const lkApiOf = (deps: Deps) => deps.lkApi ?? roomApi(lkOf(deps));
+
+async function getVoiceChannel(db: Deps['db'], channelId: string) {
+  const [channel] = await db.select().from(channels).where(eq(channels.id, channelId));
+  if (!channel) throw new AppError('NOT_FOUND', 'Channel not found');
+  if (channel.type !== 'voice') throw new AppError('VALIDATION', 'Not a voice channel');
+  return channel;
+}
 
 type Handler = (ctx: HandlerCtx, d: unknown) => Promise<void>;
 
@@ -117,5 +130,53 @@ export const handlers: Record<string, Handler> = {
     }
     ack(ctx.socket, ctx.seq);
     ctx.socket.send(serverFrame('sys.resumed', { targets: out }));
+  },
+
+  'voice.join': async (ctx, d) => {
+    const { channelId } = z.object({ channelId: z.uuid() }).parse(d);
+    const channel = await getVoiceChannel(ctx.deps.db, channelId);
+    const mp = await requirePerm(ctx.deps.db, {
+      communityId: channel.communityId, userId: ctx.userId,
+      perm: PERM.VOICE_CONNECT, channelId,
+    });
+    const lk = lkOf(ctx.deps);
+    const token = await signVoiceToken(lk, {
+      identity: ctx.userId, room: channelId, canPublish: can(mp.perms, PERM.VOICE_SPEAK),
+    });
+    ack(ctx.socket, ctx.seq);
+    ctx.socket.send(serverFrame('voice.ready', {
+      channelId, token, url: lk.url, members: ctx.voice.members(channelId),
+    }));
+    // la presencia real la confirma el webhook participant_joined → voice.state
+  },
+
+  'voice.leave': async (ctx, d) => {
+    const { channelId } = z.object({ channelId: z.uuid() }).parse(d);
+    ack(ctx.socket, ctx.seq);
+    // best-effort: si el cliente ya se desconectó del SFU, LiveKit devuelve 404 y da igual;
+    // el webhook participant_left es quien actualiza el estado
+    await lkApiOf(ctx.deps).removeParticipant(channelId, ctx.userId).catch(() => {});
+  },
+
+  'voice.mute': async (ctx, d) => {
+    const { channelId, userId, muted } = z.object({
+      channelId: z.uuid(), userId: z.uuid(), muted: z.boolean(),
+    }).parse(d);
+    const channel = await getVoiceChannel(ctx.deps.db, channelId);
+    await requirePerm(ctx.deps.db, {
+      communityId: channel.communityId, userId: ctx.userId,
+      perm: PERM.VOICE_MUTE_MEMBERS, channelId,
+    });
+    const target = await memberPerms(ctx.deps.db, channel.communityId, userId, channelId);
+    if (!target) throw new AppError('NOT_FOUND', 'Member not found');
+    // unmute solo restaura publish si el target tiene VOICE_SPEAK efectivo
+    const canPublish = !muted && can(target.perms, PERM.VOICE_SPEAK);
+    await lkApiOf(ctx.deps).updateParticipant(channelId, userId, canPublish);
+    ctx.voice.setMuted(channelId, userId, muted);
+    ack(ctx.socket, ctx.seq);
+    const { userIds } = await channelRecipients(ctx.deps.db, channelId);
+    ctx.hub.sendTo(userIds, 'voice.state', {
+      channelId, members: ctx.voice.members(channelId),
+    });
   },
 };
