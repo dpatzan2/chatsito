@@ -2,6 +2,7 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import { ZodError } from 'zod';
 import { AppError } from './core/errors.js';
 import { authRoutes } from './api/auth.js';
+import { meRoutes } from './api/me.js';
 import type { Db } from './db/client.js';
 import type { SmsSender } from './auth/sms.js';
 import type { Tokens } from './auth/tokens.js';
@@ -32,6 +33,7 @@ export function buildApp(deps: Deps): FastifyInstance {
   );
 
   authRoutes(app, deps);
+  app.register(async (scope) => meRoutes(scope, deps));
 
   return app;
 }
