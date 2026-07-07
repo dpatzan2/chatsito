@@ -1,0 +1,6 @@
+CHAT/build/
+CHAT/.dart_tool/
+CHAT/.idea/
+CHAT/.flutter-plugins-dependencies
+node_modules/
+.env
