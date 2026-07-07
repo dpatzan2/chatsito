@@ -4,14 +4,8 @@ import type { FastifyInstance } from 'fastify';
 import { users } from '../db/schema.js';
 import { authGuard } from './guard.js';
 import { AppError } from '../core/errors.js';
+import { publicUser } from '../core/wire.js';
 import type { Deps } from '../app.js';
-
-const publicUser = (u: typeof users.$inferSelect) => ({
-  id: u.id,
-  phone: u.phone,
-  displayName: u.displayName,
-  avatarColor: u.avatarColor,
-});
 
 export function meRoutes(app: FastifyInstance, deps: Deps): void {
   app.addHook('onRequest', authGuard(deps.tokens));
