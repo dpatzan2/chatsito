@@ -5,6 +5,7 @@ import { authRoutes } from './api/auth.js';
 import { meRoutes } from './api/me.js';
 import { conversationRoutes } from './api/conversations.js';
 import { communityRoutes } from './api/communities.js';
+import { voiceWebhookRoutes } from './api/voice-webhook.js';
 import { authGuard } from './api/guard.js';
 import { registerGateway } from './ws/gateway.js';
 import { Hub } from './ws/hub.js';
@@ -50,6 +51,7 @@ export function buildApp(deps: Deps): FastifyInstance {
   const hub = new Hub();
   app.decorate('hub', hub);
   const voice = new VoiceStates();
+  voiceWebhookRoutes(app, deps, hub, voice); // fuera del scope autenticado: valida la firma de LiveKit
 
   authRoutes(app, deps);
   app.register(async (scope) => {
