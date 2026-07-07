@@ -8,10 +8,14 @@ import type { Hub } from './hub.js';
 import type { Deps } from '../app.js';
 
 export async function registerGateway(app: FastifyInstance, deps: Deps, hub: Hub): Promise<void> {
-  await app.register(websocket);
+  await app.register(websocket, {
+    options: { handleProtocols: () => 'bearer' },
+  });
 
   app.get('/ws', { websocket: true }, async (socket, req) => {
-    const { token } = req.query as { token?: string };
+    // el token viaja en el subprotocolo (`bearer, <jwt>`), nunca en la URL: las URLs acaban en logs
+    const proto = req.headers['sec-websocket-protocol'] ?? '';
+    const token = proto.split(',').map((s) => s.trim()).find((s) => s && s !== 'bearer');
     let userId: string;
     try {
       userId = await deps.tokens.verifyAccess(token ?? '');

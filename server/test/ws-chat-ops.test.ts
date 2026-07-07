@@ -33,8 +33,8 @@ it('msg.delete broadcasts msg.deleted to both members', async () => {
   const { msg } = await sendMessage(ctx.db, {
     conversationId: convId, authorId: alice.id, type: 'text', content: { text: 'bye' },
   });
-  const a = wsClient(`${base}?token=${alice.access}`);
-  const b = wsClient(`${base}?token=${bob.access}`);
+  const a = wsClient(base, alice.access);
+  const b = wsClient(base, bob.access);
   await Promise.all([a.open, b.open]);
 
   a.send('msg.delete', 1, { id: msg.id });
@@ -48,8 +48,8 @@ it('msg.delete broadcasts msg.deleted to both members', async () => {
 });
 
 it('typing.start reaches only the other member', async () => {
-  const a = wsClient(`${base}?token=${alice.access}`);
-  const b = wsClient(`${base}?token=${bob.access}`);
+  const a = wsClient(base, alice.access);
+  const b = wsClient(base, bob.access);
   await Promise.all([a.open, b.open]);
 
   a.send('typing.start', 2, { conversationId: convId });
@@ -66,7 +66,7 @@ it('read.mark persists the read state', async () => {
   const { msg } = await sendMessage(ctx.db, {
     conversationId: convId, authorId: bob.id, type: 'text', content: { text: 'leeme' },
   });
-  const a = wsClient(`${base}?token=${alice.access}`);
+  const a = wsClient(base, alice.access);
   await a.open;
   a.send('read.mark', 1, { conversationId: convId, messageId: msg.id });
   expect((await a.next()).op).toBe('sys.ack');

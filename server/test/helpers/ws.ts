@@ -2,8 +2,8 @@ import WebSocket from 'ws';
 
 export interface WsFrame { v: 1; op: string; ts?: number; d?: Record<string, unknown> }
 
-export function wsClient(url: string) {
-  const ws = new WebSocket(url);
+export function wsClient(url: string, token?: string) {
+  const ws = new WebSocket(url, token ? ['bearer', token] : undefined);
   const queue: WsFrame[] = [];
   const waiters: Array<(f: WsFrame) => void> = [];
   ws.on('message', (raw) => {

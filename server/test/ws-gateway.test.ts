@@ -30,12 +30,12 @@ beforeAll(async () => {
 afterAll(async () => { await app.close(); await ctx.stop(); });
 
 it('rejects connection with bad token (close 4001)', async () => {
-  const c = wsClient(`${base}?token=garbage`);
+  const c = wsClient(base, 'garbage');
   expect(await c.closed).toBe(4001);
 });
 
 it('sys.ping → sys.ack with same seq', async () => {
-  const c = wsClient(`${base}?token=${alice.access}`);
+  const c = wsClient(base, alice.access);
   await c.open;
   c.send('sys.ping', 7);
   const f = await c.next();
@@ -44,7 +44,7 @@ it('sys.ping → sys.ack with same seq', async () => {
 });
 
 it('unknown op → sys.error VALIDATION with seq', async () => {
-  const c = wsClient(`${base}?token=${alice.access}`);
+  const c = wsClient(base, alice.access);
   await c.open;
   c.send('nope.nope', 3);
   const f = await c.next();
@@ -53,8 +53,8 @@ it('unknown op → sys.error VALIDATION with seq', async () => {
 });
 
 it('msg.send: author gets ack, both members get msg.new', async () => {
-  const a = wsClient(`${base}?token=${alice.access}`);
-  const b = wsClient(`${base}?token=${bob.access}`);
+  const a = wsClient(base, alice.access);
+  const b = wsClient(base, bob.access);
   await Promise.all([a.open, b.open]);
 
   a.send('msg.send', 1, { conversationId: convId, type: 'text', content: { text: 'hola bob' } });
@@ -78,7 +78,7 @@ it('msg.send: author gets ack, both members get msg.new', async () => {
 it('msg.send to a conversation you are not in → sys.error NOT_FOUND', async () => {
   const rows = await ctx.db.insert(users).values([{ phone: '50233333333' }]).returning();
   const tokens = tokenService(ctx.db, 's'.repeat(32));
-  const eve = wsClient(`${base}?token=${await tokens.signAccess(rows[0].id)}`);
+  const eve = wsClient(base, await tokens.signAccess(rows[0].id));
   await eve.open;
   eve.send('msg.send', 1, { conversationId: convId, type: 'text', content: { text: 'spy' } });
   const f = await eve.next();
@@ -87,7 +87,7 @@ it('msg.send to a conversation you are not in → sys.error NOT_FOUND', async ()
 });
 
 it('malformed frame → sys.error VALIDATION', async () => {
-  const c = wsClient(`${base}?token=${alice.access}`);
+  const c = wsClient(base, alice.access);
   await c.open;
   c.ws.send('not json at all');
   const f = await c.next();
