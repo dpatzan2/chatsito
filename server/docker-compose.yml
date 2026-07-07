@@ -13,6 +13,15 @@ services:
   livekit:
     image: livekit/livekit-server:latest
     command: --dev --bind 0.0.0.0
+    environment:
+      # LIVEKIT_CONFIG se mergea con los defaults de --dev (keys devkey/secret)
+      LIVEKIT_CONFIG: |
+        webhook:
+          api_key: devkey
+          urls:
+            - http://host.docker.internal:3000/livekit/webhook
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "7880:7880"
       - "7881:7881"

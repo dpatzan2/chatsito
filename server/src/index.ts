@@ -14,5 +14,12 @@ const sms =
     ? twilioSms(config.TWILIO_ACCOUNT_SID, config.TWILIO_AUTH_TOKEN, config.TWILIO_FROM)
     : devSms(console.log);
 
-const app = buildApp({ db, sms, tokens: tokenService(db, config.JWT_SECRET) });
+const app = buildApp({
+  db, sms, tokens: tokenService(db, config.JWT_SECRET),
+  lk: {
+    url: config.LIVEKIT_URL,
+    apiKey: config.LIVEKIT_API_KEY,
+    apiSecret: config.LIVEKIT_API_SECRET,
+  },
+});
 await app.listen({ port: config.PORT, host: '0.0.0.0' });
