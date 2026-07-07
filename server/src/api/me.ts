@@ -2,14 +2,11 @@ import { z } from 'zod';
 import { eq } from 'drizzle-orm';
 import type { FastifyInstance } from 'fastify';
 import { users } from '../db/schema.js';
-import { authGuard } from './guard.js';
 import { AppError } from '../core/errors.js';
 import { publicUser } from '../core/wire.js';
 import type { Deps } from '../app.js';
 
 export function meRoutes(app: FastifyInstance, deps: Deps): void {
-  app.addHook('onRequest', authGuard(deps.tokens));
-
   app.get('/me', async (req) => {
     const [u] = await deps.db.select().from(users).where(eq(users.id, req.userId));
     if (!u) throw new AppError('NOT_FOUND', 'User not found');

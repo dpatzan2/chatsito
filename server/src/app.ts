@@ -3,6 +3,8 @@ import { ZodError } from 'zod';
 import { AppError } from './core/errors.js';
 import { authRoutes } from './api/auth.js';
 import { meRoutes } from './api/me.js';
+import { conversationRoutes } from './api/conversations.js';
+import { authGuard } from './api/guard.js';
 import type { Db } from './db/client.js';
 import type { SmsSender } from './auth/sms.js';
 import type { Tokens } from './auth/tokens.js';
@@ -33,7 +35,11 @@ export function buildApp(deps: Deps): FastifyInstance {
   );
 
   authRoutes(app, deps);
-  app.register(async (scope) => meRoutes(scope, deps));
+  app.register(async (scope) => {
+    scope.addHook('onRequest', authGuard(deps.tokens));
+    meRoutes(scope, deps);
+    conversationRoutes(scope, deps);
+  });
 
   return app;
 }
