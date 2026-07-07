@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { eq } from 'drizzle-orm';
+import { and, asc, eq, gt, isNull } from 'drizzle-orm';
 import type { WebSocket } from 'ws';
 import { assertMember, deleteMessage, markRead, sendMessage } from '../chat/service.js';
-import { conversations } from '../db/schema.js';
+import { conversations, messages } from '../db/schema.js';
 import { wireMessage } from '../core/wire.js';
 import { serverFrame, MsgSendInput } from './protocol.js';
 import type { Hub } from './hub.js';
@@ -57,5 +57,29 @@ export const handlers: Record<string, Handler> = {
     }).parse(d);
     await markRead(ctx.deps.db, ctx.userId, conversationId, messageId);
     ack(ctx.socket, ctx.seq);
+  },
+
+  'sys.resume': async (ctx, d) => {
+    const { targets } = z.object({
+      targets: z.array(z.object({
+        conversationId: z.uuid(),
+        lastMsgId: z.string().min(1),
+      })).max(100),
+    }).parse(d);
+    const out = [];
+    for (const t of targets) {
+      await assertMember(ctx.deps.db, t.conversationId, ctx.userId);
+      const rows = await ctx.deps.db.select().from(messages)
+        .where(and(
+          eq(messages.conversationId, t.conversationId),
+          gt(messages.id, t.lastMsgId),
+          isNull(messages.deletedAt),
+        ))
+        .orderBy(asc(messages.id))
+        .limit(500); // ponytail: si faltan >500, el cliente repagina con historial REST
+      out.push({ conversationId: t.conversationId, messages: rows.map(wireMessage) });
+    }
+    ack(ctx.socket, ctx.seq);
+    ctx.socket.send(serverFrame('sys.resumed', { targets: out }));
   },
 };
