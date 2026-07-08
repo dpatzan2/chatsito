@@ -53,3 +53,20 @@ it('PATCH /me rejects bad color → VALIDATION', async () => {
   });
   expect(res.statusCode).toBe(400);
 });
+
+it('GET /users/lookup finds a user by phone', async () => {
+  const res = await app.inject({
+    method: 'GET', url: '/users/lookup?phone=50288888888',
+    headers: { authorization: `Bearer ${access}` },
+  });
+  expect(res.statusCode).toBe(200);
+  expect(res.json().id).toBe(userId);
+});
+
+it('GET /users/lookup unknown phone → NOT_FOUND', async () => {
+  const res = await app.inject({
+    method: 'GET', url: '/users/lookup?phone=50200000000',
+    headers: { authorization: `Bearer ${access}` },
+  });
+  expect(res.statusCode).toBe(404);
+});

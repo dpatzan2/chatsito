@@ -13,6 +13,13 @@ export function meRoutes(app: FastifyInstance, deps: Deps): void {
     return publicUser(u);
   });
 
+  app.get('/users/lookup', async (req) => {
+    const { phone } = z.object({ phone: z.string().regex(/^\d{8,15}$/) }).parse(req.query);
+    const [u] = await deps.db.select().from(users).where(eq(users.phone, phone));
+    if (!u) throw new AppError('NOT_FOUND', 'User not found');
+    return publicUser(u);
+  });
+
   app.patch('/me', async (req) => {
     const body = z.object({
       displayName: z.string().min(1).max(50).optional(),
