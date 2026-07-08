@@ -18,4 +18,10 @@ class Conversation {
   });
 
   bool get hasUnread => unread > 0;
+
+  Conversation copyWith({String? lastMessage, String? time, int? unread}) => Conversation(
+        id: id, name: name, lastMessage: lastMessage ?? this.lastMessage,
+        time: time ?? this.time, initials: initials, color: color,
+        unread: unread ?? this.unread, isGroup: isGroup,
+      );
 }

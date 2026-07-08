@@ -66,7 +66,7 @@ class ChatsScreen extends StatelessWidget {
           Positioned(
             right: 20, bottom: 96,
             child: GestureDetector(
-              onTap: () => context.read<GroupController>().openCreate(),
+              onTap: () => _openNewMenu(context),
               child: Container(
                 width: 58, height: 58,
                 decoration: BoxDecoration(
@@ -82,6 +82,99 @@ class ChatsScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+void _openNewMenu(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+    builder: (sheet) => SafeArea(
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        const SizedBox(height: 8),
+        ListTile(
+          leading: const Icon(Icons.chat_bubble_outline, color: C.accent),
+          title: const Text('Nuevo chat', style: TextStyle(fontWeight: FontWeight.w600)),
+          onTap: () { Navigator.pop(sheet); _askStartChat(context); },
+        ),
+        ListTile(
+          leading: const Icon(Icons.groups_outlined, color: C.accent),
+          title: const Text('Nueva comunidad', style: TextStyle(fontWeight: FontWeight.w600)),
+          onTap: () { Navigator.pop(sheet); context.read<GroupController>().openCreate(); },
+        ),
+        ListTile(
+          leading: const Icon(Icons.key_outlined, color: C.accent),
+          title: const Text('Unirme con código', style: TextStyle(fontWeight: FontWeight.w600)),
+          onTap: () { Navigator.pop(sheet); _askJoinCode(context); },
+        ),
+        const SizedBox(height: 8),
+      ]),
+    ),
+  );
+}
+
+void _askStartChat(BuildContext context) {
+  final chat = context.read<ChatController>();
+  _askInput(
+    context,
+    title: 'Nuevo chat',
+    hint: 'Teléfono (solo dígitos)',
+    action: 'Abrir chat',
+    keyboard: TextInputType.phone,
+    onSubmit: (v) async =>
+        await chat.startChat(v) ? null : 'No hay ningún usuario con ese número',
+  );
+}
+
+void _askJoinCode(BuildContext context) {
+  final chat = context.read<ChatController>();
+  _askInput(
+    context,
+    title: 'Unirme a una comunidad',
+    hint: 'Código de invitación',
+    action: 'Unirme',
+    keyboard: TextInputType.text,
+    onSubmit: (v) async =>
+        await chat.joinInvite(v) ? null : 'Código inválido o caducado',
+  );
+}
+
+/// Dialog con un TextField; [onSubmit] devuelve null si fue bien o el error a mostrar.
+void _askInput(BuildContext context,
+    {required String title, required String hint, required String action,
+    required TextInputType keyboard, required Future<String?> Function(String) onSubmit}) {
+  final field = TextEditingController();
+  String? error;
+  bool busy = false;
+  showDialog(
+    context: context,
+    builder: (dialog) => StatefulBuilder(
+      builder: (dialog, setState) => AlertDialog(
+        backgroundColor: Colors.white,
+        title: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: C.ink)),
+        content: TextField(
+          controller: field, autofocus: true, keyboardType: keyboard,
+          decoration: InputDecoration(hintText: hint, errorText: error),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialog), child: const Text('Cancelar')),
+          TextButton(
+            onPressed: busy ? null : () async {
+              if (field.text.trim().isEmpty) return;
+              setState(() => busy = true);
+              final err = await onSubmit(field.text.trim());
+              if (!dialog.mounted) return;
+              if (err == null) {
+                Navigator.pop(dialog);
+              } else {
+                setState(() { error = err; busy = false; });
+              }
+            },
+            child: Text(action, style: const TextStyle(fontWeight: FontWeight.w700, color: C.accent)),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _ConvoRow extends StatelessWidget {

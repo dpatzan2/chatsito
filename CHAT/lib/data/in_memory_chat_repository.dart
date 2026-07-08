@@ -1,5 +1,6 @@
 import '../core/theme/app_colors.dart';
 import '../domain/models/chat_target.dart';
+import '../domain/models/community.dart';
 import '../domain/models/contact.dart';
 import '../domain/models/conversation.dart';
 import '../domain/models/message.dart';
@@ -9,6 +10,8 @@ import 'seed_data.dart';
 class InMemoryChatRepository extends ChatRepository {
   final List<Message> _messages = SeedData.initialThread();
   ChatTarget? _active;
+  Community? _activeCommunity;
+  final Map<String, List<VoiceUser>> _voice = {};
 
   @override
   List<Conversation> get conversations => SeedData.conversations;
@@ -17,13 +20,25 @@ class InMemoryChatRepository extends ChatRepository {
   List<Contact> get contacts => SeedData.contacts;
 
   @override
+  Community? get activeCommunity => _activeCommunity;
+
+  @override
   ChatTarget? get activeChat => _active;
 
   @override
   List<Message> get messages => List.unmodifiable(_messages);
 
   @override
-  void openConversation(Conversation c) {
+  bool get peerTyping => false;
+
+  @override
+  Map<String, List<VoiceUser>> get voiceStates => _voice;
+
+  @override
+  Future<void> refresh() async {}
+
+  @override
+  Future<void> openConversation(Conversation c) async {
     _active = ChatTarget(
       title: c.name,
       initials: c.initials,
@@ -34,10 +49,45 @@ class InMemoryChatRepository extends ChatRepository {
   }
 
   @override
-  void openChannel(String name) {
-    _active = ChatTarget(title: '# $name', initials: '#', color: C.accent, subtitle: 'Equipo Producto · canal');
+  Future<void> openCommunity(String communityId) async {
+    _activeCommunity = Community(
+      id: communityId,
+      name: 'Equipo Producto',
+      ownerId: '',
+      channels: const [
+        Channel(id: 'ch-general', communityId: 'demo', name: 'general', type: 'text'),
+        Channel(id: 'ch-voz', communityId: 'demo', name: 'Sala general', type: 'voice'),
+      ],
+      members: const [],
+    );
     notifyListeners();
   }
+
+  @override
+  Future<void> openChannel(Channel ch) async {
+    _active = ChatTarget(
+      title: '# ${ch.name}',
+      initials: '#',
+      color: C.accent,
+      subtitle: '${_activeCommunity?.name ?? 'Equipo Producto'} · canal',
+    );
+    notifyListeners();
+  }
+
+  @override
+  Future<Conversation?> startChat(String phone) async => null;
+
+  @override
+  Future<Community> createCommunity(String name) async {
+    await openCommunity('demo');
+    return _activeCommunity!;
+  }
+
+  @override
+  Future<String> createInvite() async => 'DEMO1234';
+
+  @override
+  Future<bool> joinInvite(String code) async => false;
 
   @override
   Future<void> sendText(String text) async {
@@ -50,6 +100,22 @@ class InMemoryChatRepository extends ChatRepository {
   @override
   Future<void> sendMessage(Message m) async {
     _messages.add(m);
+    notifyListeners();
+  }
+
+  @override
+  Future<void> sendTyping() async {}
+
+  @override
+  Future<VoiceTicket> joinVoice(String channelId) async {
+    _voice[channelId] = [...(_voice[channelId] ?? const []), const VoiceUser('me')];
+    notifyListeners();
+    return const VoiceTicket('token', 'ws://localhost:7880');
+  }
+
+  @override
+  Future<void> leaveVoice(String channelId) async {
+    _voice.remove(channelId);
     notifyListeners();
   }
 }

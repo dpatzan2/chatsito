@@ -47,9 +47,14 @@ class OnboardingController extends ChangeNotifier {
   }
 
   Future<void> _verify() async {
-    if (!await _auth.verifyCode(otp)) return;
+    if (!await _auth.verifyCode(otp)) {
+      otp = '';
+      notifyListeners();
+      return;
+    }
     await Future.delayed(const Duration(milliseconds: 380));
-    _router.go(AppScreen.profile);
+    // usuario conocido: ya tiene nombre, directo a los chats
+    _router.go(_auth.user.hasName ? AppScreen.chats : AppScreen.profile);
   }
 
   void setName(String value) { name = value; notifyListeners(); }
