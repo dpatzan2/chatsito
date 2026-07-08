@@ -13,6 +13,8 @@ export function meRoutes(app: FastifyInstance, deps: Deps): void {
     return publicUser(u);
   });
 
+  // ponytail: descubrimiento por teléfono estilo WhatsApp — un usuario autenticado puede
+  // confirmar si un número tiene cuenta; añadir rate limit si esto se expone a internet.
   app.get('/users/lookup', async (req) => {
     const { phone } = z.object({ phone: z.string().regex(/^\d{8,15}$/) }).parse(req.query);
     const [u] = await deps.db.select().from(users).where(eq(users.phone, phone));

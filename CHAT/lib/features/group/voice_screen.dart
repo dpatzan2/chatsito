@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../domain/models/channels.dart';
+import '../../domain/repositories/chat_repository.dart';
 import 'call_controller.dart';
 
 class VoiceScreen extends StatelessWidget {
@@ -10,6 +11,7 @@ class VoiceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final call = context.watch<CallController>();
+    final community = context.watch<ChatRepository>().activeCommunity;
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -32,7 +34,12 @@ class VoiceScreen extends StatelessWidget {
                 ]),
               ),
               const SizedBox(height: 14),
-              Text('Canal de voz · Equipo Producto', style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: .55))),
+              Text(
+                call.connecting
+                    ? 'Conectando…'
+                    : 'Canal de voz · ${community?.name ?? ''}',
+                style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: .55)),
+              ),
             ]),
           ),
           Expanded(

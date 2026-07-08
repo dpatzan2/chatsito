@@ -87,7 +87,7 @@ class _ChatScreenState extends State<ChatScreen> {
 class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final c = context.read<ChatController>();
+    final c = context.watch<ChatController>();
     final t = c.target;
     return Container(
       decoration: const BoxDecoration(color: Color(0xF0FFFFFF), border: Border(bottom: BorderSide(color: C.line))),
@@ -113,7 +113,8 @@ class _Header extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(t?.title ?? '', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: C.ink)),
-                        Text(t?.subtitle ?? '', style: const TextStyle(fontSize: 12, color: C.green, fontWeight: FontWeight.w600)),
+                        Text(c.peerTyping ? 'escribiendo…' : t?.subtitle ?? '',
+                            style: const TextStyle(fontSize: 12, color: C.green, fontWeight: FontWeight.w600)),
                       ],
                     ),
                   ),

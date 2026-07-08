@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../../app/app_router.dart';
 import '../../domain/models/chat_target.dart';
+import '../../domain/models/community.dart';
 import '../../domain/models/conversation.dart';
 import '../../domain/models/message.dart';
 import '../../domain/repositories/chat_repository.dart';
@@ -18,10 +19,12 @@ class ChatController extends ChangeNotifier {
   List<Message> get messages => _chat.messages;
   ChatTarget? get target => _chat.activeChat;
   bool get hasDraft => draft.trim().isNotEmpty;
+  bool get peerTyping => _chat.peerTyping;
 
   void openConversation(Conversation c) {
     _resetSheets();
     if (c.isGroup) {
+      _chat.openCommunity(c.id);
       _router.go(AppScreen.group);
       return;
     }
@@ -29,17 +32,39 @@ class ChatController extends ChangeNotifier {
     _router.go(AppScreen.chat);
   }
 
-  void openChannel(String name) {
+  void openChannel(Channel ch) {
     _resetSheets();
-    _chat.openChannel(name);
+    _chat.openChannel(ch);
     _router.go(AppScreen.chat);
+  }
+
+  /// Busca un usuario por teléfono y abre (o crea) el 1:1. false si no existe.
+  Future<bool> startChat(String phone) async {
+    final conv = await _chat.startChat(phone.replaceAll(RegExp(r'\D'), ''));
+    if (conv == null) return false;
+    _resetSheets();
+    await _chat.openConversation(conv);
+    _router.go(AppScreen.chat);
+    return true;
+  }
+
+  /// Se une a una comunidad con un código de invitación. false si es inválido.
+  Future<bool> joinInvite(String code) async {
+    if (!await _chat.joinInvite(code)) return false;
+    _router.go(AppScreen.group);
+    return true;
   }
 
   void openContactProfile() => _router.go(AppScreen.contactProfile);
   void backToChats() => _router.go(AppScreen.chats);
   void backToChat() => _router.go(AppScreen.chat);
 
-  void setDraft(String v) { draft = v; notifyListeners(); }
+  void setDraft(String v) {
+    draft = v;
+    notifyListeners();
+    if (v.trim().isNotEmpty) _chat.sendTyping();
+  }
+
   void addEmoji(String glyph) { draft += glyph; notifyListeners(); }
 
   Future<void> send() async {

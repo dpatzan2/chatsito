@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
-import '../../data/seed_data.dart';
-import '../../domain/models/channels.dart';
+import '../../domain/models/community.dart';
+import '../../domain/repositories/chat_repository.dart';
 import '../chat/chat_controller.dart';
 import 'call_controller.dart';
 import 'group_controller.dart';
@@ -14,6 +14,7 @@ class GroupScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final chat = context.read<ChatController>();
     final call = context.watch<CallController>();
+    final community = context.watch<ChatRepository>().activeCommunity;
     return Container(
       color: C.ink,
       child: Column(
@@ -32,7 +33,7 @@ class GroupScreen extends StatelessWidget {
                 Row(children: [
                   _roundBtn(Icons.arrow_back_ios_new, () => context.read<GroupController>().back()),
                   const Spacer(),
-                  _roundBtn(Icons.more_horiz, () {}),
+                  _roundBtn(Icons.person_add_alt_1, () => context.read<GroupController>().openInvite()),
                 ]),
                 const SizedBox(height: 16),
                 Container(
@@ -41,9 +42,11 @@ class GroupScreen extends StatelessWidget {
                   child: const Icon(Icons.groups, color: Colors.white, size: 28),
                 ),
                 const SizedBox(height: 12),
-                const Text('Equipo Producto', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: -.3)),
+                Text(community?.name ?? 'Comunidad',
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: -.3)),
                 const SizedBox(height: 5),
-                Text('8 miembros · 3 en línea', style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: .7))),
+                Text('${community?.members.length ?? 0} miembros',
+                    style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: .7))),
               ],
             ),
           ),
@@ -52,9 +55,9 @@ class GroupScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(14, 20, 14, 30),
               children: [
                 _label('Canales de texto'),
-                for (final ch in SeedData.textChannels) _textChannel(context, chat, ch),
+                for (final ch in community?.textChannels ?? const <Channel>[]) _textChannel(context, chat, ch),
                 _label('Canales de voz'),
-                for (final v in call.groupVoiceChannels) _voiceChannel(context, call, v),
+                for (final ch in community?.voiceChannels ?? const <Channel>[]) _voiceChannel(context, call, ch),
               ],
             ),
           ),
@@ -77,36 +80,27 @@ class GroupScreen extends StatelessWidget {
         child: Text(t.toUpperCase(), style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: Color(0xFF7E8190), letterSpacing: .6)),
       );
 
-  Widget _textChannel(BuildContext context, ChatController chat, TextChannel ch) {
+  // ponytail: read-states de canal diferidos — sin badge de no-leídos por canal
+  Widget _textChannel(BuildContext context, ChatController chat, Channel ch) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () => chat.openChannel(ch.name),
+      onTap: () => chat.openChannel(ch),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
-        decoration: BoxDecoration(
-          color: ch.active ? Colors.white.withValues(alpha: .08) : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-        ),
         child: Row(children: [
           const Text('#', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Color(0xFF7E8190))),
           const SizedBox(width: 10),
-          Expanded(child: Text(ch.name, style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w600, color: ch.active ? Colors.white : const Color(0xFFC7CAD3)))),
-          if (ch.hasBadge)
-            Container(
-              constraints: const BoxConstraints(minWidth: 20), height: 20,
-              padding: const EdgeInsets.symmetric(horizontal: 6), alignment: Alignment.center,
-              decoration: BoxDecoration(color: C.accent, borderRadius: BorderRadius.circular(10)),
-              child: Text('${ch.badge}', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white)),
-            ),
+          Expanded(child: Text(ch.name, style: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.w600, color: Color(0xFFC7CAD3)))),
         ]),
       ),
     );
   }
 
-  Widget _voiceChannel(BuildContext context, CallController call, VoiceChannel v) {
+  Widget _voiceChannel(BuildContext context, CallController call, Channel ch) {
+    final members = call.membersOf(ch.id);
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () => call.openCall(v.name),
+      onTap: () => call.openCall(ch),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         child: Column(
@@ -115,14 +109,15 @@ class GroupScreen extends StatelessWidget {
             Row(children: [
               const Icon(Icons.volume_up_outlined, size: 18, color: Color(0xFF7E8190)),
               const SizedBox(width: 10),
-              Expanded(child: Text(v.name, style: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.w600, color: Color(0xFFC7CAD3)))),
-              Text(v.isEmpty ? 'Vacío' : '${v.members.length} conectados', style: const TextStyle(fontSize: 12, color: Color(0xFF7E8190), fontWeight: FontWeight.w600)),
+              Expanded(child: Text(ch.name, style: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.w600, color: Color(0xFFC7CAD3)))),
+              Text(members.isEmpty ? 'Vacío' : '${members.length} conectados',
+                  style: const TextStyle(fontSize: 12, color: Color(0xFF7E8190), fontWeight: FontWeight.w600)),
             ]),
-            if (!v.isEmpty)
+            if (members.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(left: 28, top: 8, bottom: 2),
                 child: Column(
-                  children: [for (final m in v.members) Padding(
+                  children: [for (final m in members) Padding(
                     padding: const EdgeInsets.only(bottom: 7),
                     child: Row(children: [
                       Container(
