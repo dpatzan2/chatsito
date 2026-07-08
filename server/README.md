@@ -12,6 +12,10 @@ Backend del chat: Fastify + Postgres (Drizzle) + LiveKit.
 Sin credenciales de Twilio en `.env`, el código OTP se imprime en la consola
 del servidor (`[DEV SMS] ...`).
 
+El front Flutter (`../CHAT`) se conecta a este server: ver su README para
+correr la app y el smoke end-to-end. `GET /users/lookup?phone=` busca un
+usuario por teléfono (para iniciar chats nuevos desde la app).
+
 ## Tests
 
     npm test                      # requiere Docker (Testcontainers)
