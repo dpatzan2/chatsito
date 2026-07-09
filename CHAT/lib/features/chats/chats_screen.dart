@@ -33,7 +33,7 @@ class ChatsScreen extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(t.chatsTitle, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w800, color: C.ink, letterSpacing: -.5)),
+                        Expanded(child: Text(t.chatsTitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w800, color: C.ink, letterSpacing: -.5))),
                         GestureDetector(
                           onTap: () => router.go(AppScreen.settings),
                           child: Container(

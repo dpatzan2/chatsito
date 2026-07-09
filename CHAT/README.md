@@ -18,7 +18,14 @@ Sin Twilio configurado, el código OTP sale en la consola del server
 (`[DEV SMS] ...`). La sesión persiste entre reinicios (shared_preferences);
 solo se vuelve a pedir el código si el refresh token caduca.
 
-- **Nuevo chat**: botón ✏️ → *Nuevo chat* → teléfono del otro usuario.
+- **Idiomas**: es, en, pt, fr — se usa el del sistema (fallback: español).
+  Añadir uno = un archivo `lib/l10n/intl_<código>.arb` + su entrada en
+  `wireStrings` (wire.dart).
+- **Registro**: el prefijo telefónico se elige de una lista de países
+  (preseleccionado por la región del sistema); el número viaja como
+  `prefijo+dígitos`.
+- **Nuevo chat**: botón ✏️ → *Nuevo chat* → teléfono del otro usuario
+  (con prefijo de país, solo dígitos).
 - **Comunidades**: ✏️ → *Nueva comunidad*; se invita con el código que genera
   el botón 👤+ del grupo, y se entra con *Unirme con código*.
 - **No leídos**: contador por conversación y por comunidad en la lista de
