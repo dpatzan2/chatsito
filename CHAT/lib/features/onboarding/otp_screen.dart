@@ -61,9 +61,8 @@ class OtpScreen extends StatelessWidget {
                     );
                   })),
                   const SizedBox(height: 26),
-                  const Row(children: [
+                  const Wrap(spacing: 7, children: [
                     Text('¿No llegó?', style: TextStyle(fontSize: 13.5, color: C.muted)),
-                    SizedBox(width: 7),
                     Text('Reenviar en 0:28', style: TextStyle(fontSize: 13.5, color: C.accent, fontWeight: FontWeight.w700)),
                   ]),
                 ],
