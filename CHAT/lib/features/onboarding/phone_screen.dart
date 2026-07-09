@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../app/app_router.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/utils/countries.dart';
 import '../../core/widgets/back_chevron.dart';
 import '../../core/widgets/numeric_keypad.dart';
 import '../../core/widgets/primary_button.dart';
@@ -32,14 +33,18 @@ class PhoneScreen extends StatelessWidget {
                     style: TextStyle(fontSize: 14.5, height: 1.5, color: C.sub)),
                   const SizedBox(height: 32),
                   Row(children: [
-                    Container(
-                      height: 58, padding: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(color: C.fieldAlt, borderRadius: BorderRadius.circular(14), border: Border.all(color: C.border, width: 1.5)),
-                      child: const Row(children: [
-                        Text('🇪🇸', style: TextStyle(fontSize: 20)),
-                        SizedBox(width: 8),
-                        Text('+34', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: C.ink)),
-                      ]),
+                    GestureDetector(
+                      onTap: () => _pickCountry(context, c),
+                      child: Container(
+                        height: 58, padding: const EdgeInsets.symmetric(horizontal: 14),
+                        decoration: BoxDecoration(color: C.fieldAlt, borderRadius: BorderRadius.circular(14), border: Border.all(color: C.border, width: 1.5)),
+                        child: Row(mainAxisSize: MainAxisSize.min, children: [
+                          Text(c.country.flag, style: const TextStyle(fontSize: 20)),
+                          const SizedBox(width: 6),
+                          Text('+${c.country.dial}', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: C.ink)),
+                          const Icon(Icons.expand_more, size: 18, color: C.muted),
+                        ]),
+                      ),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
@@ -75,4 +80,58 @@ class PhoneScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+void _pickCountry(BuildContext context, OnboardingController c) {
+  var query = '';
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+    builder: (sheet) => StatefulBuilder(
+      builder: (sheet, setState) {
+        final visible = [
+          for (final k in countries)
+            if (query.isEmpty ||
+                k.name.toLowerCase().contains(query) ||
+                ('+${k.dial}').contains(query))
+              k,
+        ];
+        return SizedBox(
+          height: MediaQuery.sizeOf(sheet).height * .72,
+          child: Column(children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+              child: TextField(
+                onChanged: (v) => setState(() => query = v.trim().toLowerCase()),
+                decoration: InputDecoration(
+                  hintText: 'Buscar país',
+                  prefixIcon: const Icon(Icons.search, size: 20),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(13)),
+                ),
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: visible.length,
+                itemBuilder: (_, i) {
+                  final k = visible[i];
+                  return ListTile(
+                    leading: Text(k.flag, style: const TextStyle(fontSize: 22)),
+                    title: Text(k.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+                    trailing: Text('+${k.dial}', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: C.accent)),
+                    onTap: () {
+                      c.setCountry(k);
+                      Navigator.pop(sheet);
+                    },
+                  );
+                },
+              ),
+            ),
+          ]),
+        );
+      },
+    ),
+  );
 }
