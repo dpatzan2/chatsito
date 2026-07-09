@@ -8,6 +8,9 @@ import '../models/user_profile.dart';
 abstract class AuthRepository extends ChangeNotifier {
   UserProfile get user;
 
+  /// Restaura la sesión persistida. false si no hay o el backend la rechaza.
+  Future<bool> restore() async => false;
+
   /// Send a verification SMS to [phone] (digits only).
   Future<void> requestCode(String phone);
 
