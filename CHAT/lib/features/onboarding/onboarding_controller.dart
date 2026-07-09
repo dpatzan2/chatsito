@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../../app/app_router.dart';
+import '../../core/utils/countries.dart';
 import '../../core/utils/formatters.dart';
 import '../../domain/repositories/auth_repository.dart';
 
@@ -11,8 +12,20 @@ class OnboardingController extends ChangeNotifier {
 
   String phone = '', otp = '', name = '';
 
+  /// Preseleccionado por la región del locale del sistema (es_GT → 🇬🇹 +502).
+  Country country =
+      countryForIso(PlatformDispatcher.instance.locale.countryCode);
+
+  void setCountry(Country c) {
+    country = c;
+    notifyListeners();
+  }
+
+  /// Lo que se registra en el server: prefijo + número, solo dígitos.
+  String get fullPhone => '${country.dial}$phone';
+
   String get phoneFormatted => formatPhone(phone);
-  bool get phoneComplete => phone.length >= 9;
+  bool get phoneComplete => phone.length >= 8;
   bool get nameValid => name.trim().isNotEmpty;
 
   void start() => _router.go(AppScreen.phone);
@@ -42,7 +55,7 @@ class OnboardingController extends ChangeNotifier {
 
   Future<void> submitPhone() async {
     if (!phoneComplete) return;
-    await _auth.requestCode(phone);
+    await _auth.requestCode(fullPhone);
     _router.go(AppScreen.otp);
   }
 

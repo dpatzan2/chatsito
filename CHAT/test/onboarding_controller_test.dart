@@ -1,4 +1,5 @@
 import 'package:chatsito/app/app_router.dart';
+import 'package:chatsito/core/utils/countries.dart';
 import 'package:chatsito/data/in_memory_auth_repository.dart';
 import 'package:chatsito/features/onboarding/onboarding_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -24,18 +25,20 @@ void main() {
     expect(c.phoneFormatted, '612 345 678');
     expect(c.phoneComplete, true);
     c.onBackspace();
-    expect(c.phone, '61234567');
-    expect(c.phoneComplete, false);
+    c.onBackspace();
+    expect(c.phone, '6123456');
+    expect(c.phoneComplete, false); // mínimo 8 dígitos
   });
 
-  test('submitPhone stores the number and advances to OTP', () async {
+  test('submitPhone stores dial code + number and advances to OTP', () async {
     c.start();
+    c.setCountry(countryForIso('ES'));
     for (final d in '600000000'.split('')) {
       c.onDigit(d);
     }
     await c.submitPhone();
     expect(router.screen, AppScreen.otp);
-    expect(auth.user.phone, '600000000');
+    expect(auth.user.phone, '34600000000');
   });
 
   test('OTP caps at 6 digits', () {
