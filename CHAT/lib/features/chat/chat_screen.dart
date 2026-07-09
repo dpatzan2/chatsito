@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
+import '../../l10n/app_localizations.dart';
 import 'chat_controller.dart';
 import 'widgets/attach_sheet.dart';
 import 'widgets/chat_input_bar.dart';
@@ -66,7 +67,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
                         margin: const EdgeInsets.only(bottom: 4),
                         decoration: BoxDecoration(color: C.aOpacity(90), borderRadius: BorderRadius.circular(11)),
-                        child: const Text('Hoy', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: C.accent)),
+                        child: Text(S.of(context).today, style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: C.accent)),
                       ),
                     ),
                     for (final m in c.messages) MessageBubble(m),
@@ -113,7 +114,7 @@ class _Header extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(t?.title ?? '', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: C.ink)),
-                        Text(c.peerTyping ? 'escribiendo…' : t?.subtitle ?? '',
+                        Text(c.peerTyping ? S.of(context).typing : t?.subtitle ?? '',
                             style: const TextStyle(fontSize: 12, color: C.green, fontWeight: FontWeight.w600)),
                       ],
                     ),

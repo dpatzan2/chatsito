@@ -4,6 +4,7 @@ import '../../app/app_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/back_chevron.dart';
 import '../../core/widgets/numeric_keypad.dart';
+import '../../l10n/app_localizations.dart';
 import 'onboarding_controller.dart';
 
 class OtpScreen extends StatelessWidget {
@@ -12,6 +13,7 @@ class OtpScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.watch<OnboardingController>();
+    final t = S.of(context);
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.only(top: 8),
@@ -31,13 +33,13 @@ class OtpScreen extends StatelessWidget {
                     child: const Icon(Icons.mail_outline, color: C.accent, size: 26),
                   ),
                   const SizedBox(height: 22),
-                  const Text('Verifica tu número', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: C.ink, letterSpacing: -.4)),
+                  Text(t.otpTitle, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: C.ink, letterSpacing: -.4)),
                   const SizedBox(height: 10),
                   Text.rich(TextSpan(
                     style: const TextStyle(fontSize: 14.5, height: 1.5, color: C.sub),
                     children: [
-                      const TextSpan(text: 'Introduce el código enviado al '),
-                      TextSpan(text: '+34 ${c.phoneFormatted}', style: const TextStyle(color: C.ink, fontWeight: FontWeight.w700)),
+                      TextSpan(text: t.otpSentTo),
+                      TextSpan(text: '+${c.country.dial} ${c.phoneFormatted}', style: const TextStyle(color: C.ink, fontWeight: FontWeight.w700)),
                     ],
                   )),
                   const SizedBox(height: 30),
@@ -61,9 +63,9 @@ class OtpScreen extends StatelessWidget {
                     );
                   })),
                   const SizedBox(height: 26),
-                  const Wrap(spacing: 7, children: [
-                    Text('¿No llegó?', style: TextStyle(fontSize: 13.5, color: C.muted)),
-                    Text('Reenviar en 0:28', style: TextStyle(fontSize: 13.5, color: C.accent, fontWeight: FontWeight.w700)),
+                  Wrap(spacing: 7, children: [
+                    Text(t.otpNotReceived, style: const TextStyle(fontSize: 13.5, color: C.muted)),
+                    Text(t.otpResendIn('0:28'), style: const TextStyle(fontSize: 13.5, color: C.accent, fontWeight: FontWeight.w700)),
                   ]),
                 ],
               ),

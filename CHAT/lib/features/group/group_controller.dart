@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../../app/app_router.dart';
+import '../../data/api/wire.dart';
 import '../../domain/models/community.dart';
 import '../../domain/models/contact.dart';
 import '../../domain/repositories/chat_repository.dart';
@@ -27,7 +28,7 @@ class GroupController extends ChangeNotifier {
   // ponytail: la selección de contactos es decorativa — los miembros reales
   // entran con el código de invitación (el backend no tiene "añadir miembro").
   Future<void> create() async {
-    final name = groupName.trim().isEmpty ? 'Nueva comunidad' : groupName.trim();
+    final name = groupName.trim().isEmpty ? wireStrings.newCommunity : groupName.trim();
     await _chat.createCommunity(name);
     _router.go(AppScreen.group);
   }

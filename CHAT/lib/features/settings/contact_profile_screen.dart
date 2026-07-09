@@ -4,6 +4,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_toggle.dart';
 import '../../core/widgets/avatar.dart';
 import '../../domain/models/chat_target.dart';
+import '../../l10n/app_localizations.dart';
 import '../chat/chat_controller.dart';
 import 'settings_controller.dart';
 
@@ -15,6 +16,7 @@ class ContactProfileScreen extends StatelessWidget {
     final chat = context.read<ChatController>();
     final settings = context.watch<SettingsController>();
     final t = chat.target ?? const ChatTarget(title: '', initials: '', subtitle: '', color: C.accent);
+    final s = S.of(context);
 
     return Container(
       color: C.field,
@@ -40,30 +42,30 @@ class ContactProfileScreen extends StatelessWidget {
               ),
               Transform.translate(
                 offset: const Offset(0, -16),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(children: [
-                    _Action(Icons.call_outlined, 'Audio'),
-                    _Action(Icons.videocam_outlined, 'Vídeo'),
-                    _Action(Icons.search, 'Buscar'),
-                    _Action(Icons.notifications_off_outlined, 'Silenciar'),
+                    _Action(Icons.call_outlined, s.actionAudio),
+                    _Action(Icons.videocam_outlined, s.actionVideo),
+                    _Action(Icons.search, s.actionSearch),
+                    _Action(Icons.notifications_off_outlined, s.actionMute),
                   ]),
                 ),
               ),
-              _section(margin: const EdgeInsets.fromLTRB(16, 0, 16, 0), child: const Column(
+              _section(margin: const EdgeInsets.fromLTRB(16, 0, 16, 0), child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('ACERCA DE', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: C.muted, letterSpacing: .4)),
-                  SizedBox(height: 8),
-                  Text('Disponible ✨ Diseñando cosas bonitas en el equipo de producto.', style: TextStyle(fontSize: 15.5, height: 1.45, color: C.ink)),
+                  Text(s.aboutHeader.toUpperCase(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: C.muted, letterSpacing: .4)),
+                  const SizedBox(height: 8),
+                  Text(s.aboutSample, style: const TextStyle(fontSize: 15.5, height: 1.45, color: C.ink)),
                 ],
               )),
               _section(margin: const EdgeInsets.fromLTRB(16, 16, 16, 0), child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(children: [
-                    Expanded(child: Text('Multimedia y archivos', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700, color: C.ink))),
-                    Text('Ver todo ›', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: C.accent)),
+                  Row(children: [
+                    Expanded(child: Text(s.mediaFiles, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700, color: C.ink))),
+                    Text(s.seeAll, style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: C.accent)),
                   ]),
                   const SizedBox(height: 12),
                   GridView.count(
@@ -79,23 +81,23 @@ class ContactProfileScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: C.hair))),
                   child: Row(children: [
-                    const Expanded(child: Text('Silenciar notificaciones', style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w500, color: C.ink))),
+                    Expanded(child: Text(s.muteNotifications, style: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.w500, color: C.ink))),
                     AppToggle(settings.isOn('contactMute'), () => settings.toggle('contactMute')),
                   ]),
                 ),
-                _navRow('Mensajes temporales', 'Desactivado'),
-                _navRow('Cifrado', 'Verificado', last: true),
+                _navRow(s.tempMessages, s.disabled),
+                _navRow(s.encryption, s.verified, last: true),
               ])),
               _section(margin: const EdgeInsets.fromLTRB(16, 16, 16, 0), padding: EdgeInsets.zero, child: Column(children: [
-                _dangerRow(Icons.block, 'Bloquear a ${t.title}'),
-                _dangerRow(Icons.flag_outlined, 'Reportar contacto', last: true),
+                _dangerRow(Icons.block, s.blockContact(t.title)),
+                _dangerRow(Icons.flag_outlined, s.reportContact, last: true),
               ])),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(28, 20, 28, 0),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(28, 20, 28, 0),
                 child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Icon(Icons.lock_outline, size: 13, color: C.faint),
-                  SizedBox(width: 6),
-                  Flexible(child: Text('Tus mensajes están cifrados de extremo a extremo.', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: C.faint))),
+                  const Icon(Icons.lock_outline, size: 13, color: C.faint),
+                  const SizedBox(width: 6),
+                  Flexible(child: Text(s.e2eNotice, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, color: C.faint))),
                 ]),
               ),
             ],

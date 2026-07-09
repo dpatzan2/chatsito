@@ -36,7 +36,7 @@ class CallController extends ChangeNotifier {
   VoiceMember _memberOf(VoiceUser u) {
     final self = u.userId == _auth.user.id;
     final m = _chat.activeCommunity?.member(u.userId);
-    final name = self ? 'Tú' : (m?.name ?? '···');
+    final name = self ? wireStrings.you : (m?.name ?? '···');
     return VoiceMember(
       name: name,
       initials: self ? _auth.user.youInitials : initialsOf(name),

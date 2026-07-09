@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/primary_button.dart';
+import '../../l10n/app_localizations.dart';
 import 'onboarding_controller.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -25,6 +26,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final c = context.watch<OnboardingController>();
+    final t = S.of(context);
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.only(top: 8),
@@ -37,9 +39,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Configura tu perfil', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: C.ink, letterSpacing: -.4)),
+                  Text(t.profileTitle, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: C.ink, letterSpacing: -.4)),
                   const SizedBox(height: 10),
-                  const Text('Pon tu nombre y una foto. Podrás cambiarlos cuando quieras.', style: TextStyle(fontSize: 14.5, height: 1.5, color: C.sub)),
+                  Text(t.profileSubtitle, style: const TextStyle(fontSize: 14.5, height: 1.5, color: C.sub)),
                   const SizedBox(height: 34),
                   Center(
                     child: Stack(clipBehavior: Clip.none, children: [
@@ -59,14 +61,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ]),
                   ),
                   const SizedBox(height: 34),
-                  const Text('TU NOMBRE', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: C.muted, letterSpacing: .4)),
+                  Text(t.profileNameLabel.toUpperCase(), style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: C.muted, letterSpacing: .4)),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _name,
                     onChanged: c.setName,
                     style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: C.ink),
                     decoration: InputDecoration(
-                      hintText: 'Ej. Marta García',
+                      hintText: t.profileNameHint,
                       hintStyle: const TextStyle(color: C.muted, fontWeight: FontWeight.w600),
                       filled: true, fillColor: C.fieldAlt,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 17),
@@ -81,7 +83,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(32, 0, 32, 30),
-            child: PrimaryButton('Empezar a chatear', c.finish, enabled: c.nameValid),
+            child: PrimaryButton(t.profileCta, c.finish, enabled: c.nameValid),
           ),
         ],
       ),

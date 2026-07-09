@@ -6,6 +6,7 @@ import '../../core/utils/countries.dart';
 import '../../core/widgets/back_chevron.dart';
 import '../../core/widgets/numeric_keypad.dart';
 import '../../core/widgets/primary_button.dart';
+import '../../l10n/app_localizations.dart';
 import 'onboarding_controller.dart';
 
 class PhoneScreen extends StatelessWidget {
@@ -14,6 +15,7 @@ class PhoneScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.watch<OnboardingController>();
+    final t = S.of(context);
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.only(top: 8),
@@ -27,10 +29,10 @@ class PhoneScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Tu número de teléfono', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: C.ink, letterSpacing: -.4)),
+                  Text(t.phoneTitle, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: C.ink, letterSpacing: -.4)),
                   const SizedBox(height: 10),
-                  const Text('Te enviaremos un SMS con un código de 6 dígitos para verificar tu cuenta.',
-                    style: TextStyle(fontSize: 14.5, height: 1.5, color: C.sub)),
+                  Text(t.phoneSubtitle,
+                    style: const TextStyle(fontSize: 14.5, height: 1.5, color: C.sub)),
                   const SizedBox(height: 32),
                   Row(children: [
                     GestureDetector(
@@ -65,14 +67,14 @@ class PhoneScreen extends StatelessWidget {
                     ),
                   ]),
                   const SizedBox(height: 16),
-                  const Text('Puede que se apliquen tarifas de tu operador.', style: TextStyle(fontSize: 12.5, color: C.muted)),
+                  Text(t.phoneCarrierFee, style: const TextStyle(fontSize: 12.5, color: C.muted)),
                 ],
               ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32),
-            child: PrimaryButton('Enviar código', c.submitPhone, enabled: c.phoneComplete),
+            child: PrimaryButton(t.phoneCta, c.submitPhone, enabled: c.phoneComplete),
           ),
           const SizedBox(height: 6),
           NumericKeypad(onDigit: c.onDigit, onBackspace: c.onBackspace),
@@ -106,7 +108,7 @@ void _pickCountry(BuildContext context, OnboardingController c) {
               child: TextField(
                 onChanged: (v) => setState(() => query = v.trim().toLowerCase()),
                 decoration: InputDecoration(
-                  hintText: 'Buscar país',
+                  hintText: S.of(context).searchCountry,
                   prefixIcon: const Icon(Icons.search, size: 20),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(13)),
                 ),

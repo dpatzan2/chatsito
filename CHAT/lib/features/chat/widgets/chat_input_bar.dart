@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../chat_controller.dart';
 
 class ChatInputBar extends StatelessWidget {
@@ -31,10 +32,10 @@ class ChatInputBar extends StatelessWidget {
                     onSubmitted: (_) => c.send(),
                     textInputAction: TextInputAction.send,
                     style: const TextStyle(fontSize: 15, color: C.ink),
-                    decoration: const InputDecoration(
-                      hintText: 'Mensaje', hintStyle: TextStyle(color: C.muted),
+                    decoration: InputDecoration(
+                      hintText: S.of(context).messageHint, hintStyle: const TextStyle(color: C.muted),
                       border: InputBorder.none, isDense: true,
-                      contentPadding: EdgeInsets.symmetric(vertical: 10),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
                     ),
                   ),
                 ),

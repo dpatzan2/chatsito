@@ -4,6 +4,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/widgets/avatar.dart';
 import '../../core/widgets/primary_button.dart';
 import '../../domain/models/contact.dart';
+import '../../l10n/app_localizations.dart';
 import 'group_controller.dart';
 
 class CreateGroupScreen extends StatefulWidget {
@@ -28,6 +29,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   Widget build(BuildContext context) {
     final c = context.watch<GroupController>();
     final n = c.selectedCount;
+    final t = S.of(context);
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.only(top: 8),
@@ -40,8 +42,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               Expanded(child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Nuevo grupo', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: C.ink)),
-                  Text('$n ${n == 1 ? 'participante' : 'participantes'} seleccionados', style: const TextStyle(fontSize: 12.5, color: C.muted)),
+                  Text(t.newGroupTitle, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: C.ink)),
+                  Text(t.participantsSelected(n), style: const TextStyle(fontSize: 12.5, color: C.muted)),
                 ],
               )),
             ]),
@@ -60,17 +62,17 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 controller: _name,
                 onChanged: c.setGroupName,
                 style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: C.ink),
-                decoration: const InputDecoration(
-                  hintText: 'Nombre del grupo', hintStyle: TextStyle(color: C.muted, fontWeight: FontWeight.w600),
-                  enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: C.border, width: 1.5)),
-                  focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: C.accent, width: 1.5)),
+                decoration: InputDecoration(
+                  hintText: t.groupNameHint, hintStyle: const TextStyle(color: C.muted, fontWeight: FontWeight.w600),
+                  enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: C.border, width: 1.5)),
+                  focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: C.accent, width: 1.5)),
                 ),
               )),
             ]),
           ),
-          const Padding(
-            padding: EdgeInsets.fromLTRB(22, 14, 22, 6),
-            child: Align(alignment: Alignment.centerLeft, child: Text('AÑADIR PARTICIPANTES', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: C.muted, letterSpacing: .4))),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 14, 22, 6),
+            child: Align(alignment: Alignment.centerLeft, child: Text(t.addParticipants.toUpperCase(), style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: C.muted, letterSpacing: .4))),
           ),
           Expanded(
             child: ListView(
@@ -80,7 +82,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 0, 22, 30),
-            child: PrimaryButton('Crear grupo', c.create, height: 54),
+            child: PrimaryButton(t.createGroupCta, c.create, height: 54),
           ),
         ],
       ),

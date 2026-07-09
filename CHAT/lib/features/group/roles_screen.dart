@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../domain/models/community.dart';
 import '../../domain/repositories/chat_repository.dart';
+import '../../l10n/app_localizations.dart';
 import 'group_controller.dart';
 
 class RolesScreen extends StatelessWidget {
@@ -22,9 +23,9 @@ class RolesScreen extends StatelessWidget {
             IconButton(
                 onPressed: gc.closeRoles,
                 icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: Colors.white)),
-            const Expanded(
-                child: Text('Roles',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white))),
+            Expanded(
+                child: Text(S.of(context).rolesTitle,
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white))),
             IconButton(
                 onPressed: () => gc.openRole(null),
                 icon: const Icon(Icons.add, color: Colors.white)),

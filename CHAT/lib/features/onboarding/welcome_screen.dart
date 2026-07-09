@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/primary_button.dart';
+import '../../l10n/app_localizations.dart';
 import 'onboarding_controller.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -10,6 +11,7 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.read<OnboardingController>();
+    final t = S.of(context);
     return Container(
       decoration: BoxDecoration(
         gradient: RadialGradient(
@@ -46,24 +48,24 @@ class WelcomeScreen extends StatelessWidget {
                         const SizedBox(height: 14),
                         ConstrainedBox(
                           constraints: const BoxConstraints(maxWidth: 250),
-                          child: const Text('Mensajería privada para tu equipo. Chats, grupos, canales de voz y mucho más.',
-                            textAlign: TextAlign.center, style: TextStyle(fontSize: 16, height: 1.5, color: C.sub)),
+                          child: Text(t.welcomeTagline,
+                            textAlign: TextAlign.center, style: const TextStyle(fontSize: 16, height: 1.5, color: C.sub)),
                         ),
                       ],
                     ),
                   ),
-                  PrimaryButton('Continuar con tu número', c.start),
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(4, 18, 4, 0),
+                  PrimaryButton(t.welcomeCta, c.start),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(4, 18, 4, 0),
                     child: Text.rich(
                       TextSpan(
-                        style: TextStyle(fontSize: 11.5, height: 1.6, color: Color(0xFF9A9DA8)),
+                        style: const TextStyle(fontSize: 11.5, height: 1.6, color: Color(0xFF9A9DA8)),
                         children: [
-                          TextSpan(text: 'Al continuar aceptas los '),
-                          TextSpan(text: 'Términos', style: TextStyle(color: C.accent, fontWeight: FontWeight.w600)),
-                          TextSpan(text: ' y la '),
-                          TextSpan(text: 'Política de privacidad', style: TextStyle(color: C.accent, fontWeight: FontWeight.w600)),
-                          TextSpan(text: ' de Chatsito.'),
+                          TextSpan(text: t.legalPrefix),
+                          TextSpan(text: t.legalTerms, style: const TextStyle(color: C.accent, fontWeight: FontWeight.w600)),
+                          TextSpan(text: t.legalAnd),
+                          TextSpan(text: t.legalPrivacy, style: const TextStyle(color: C.accent, fontWeight: FontWeight.w600)),
+                          TextSpan(text: t.legalSuffix),
                         ],
                       ),
                       textAlign: TextAlign.center,

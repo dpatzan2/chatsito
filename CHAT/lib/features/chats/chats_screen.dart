@@ -6,6 +6,7 @@ import '../../core/widgets/avatar.dart';
 import '../../domain/models/conversation.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/repositories/chat_repository.dart';
+import '../../l10n/app_localizations.dart';
 import '../chat/chat_controller.dart';
 import '../group/group_controller.dart';
 
@@ -17,6 +18,7 @@ class ChatsScreen extends StatelessWidget {
     final conversations = context.watch<ChatRepository>().conversations;
     final initials = context.watch<AuthRepository>().user.initials;
     final router = context.read<AppRouter>();
+    final t = S.of(context);
 
     return Container(
       color: Colors.white,
@@ -31,7 +33,7 @@ class ChatsScreen extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Chats', style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800, color: C.ink, letterSpacing: -.5)),
+                        Text(t.chatsTitle, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w800, color: C.ink, letterSpacing: -.5)),
                         GestureDetector(
                           onTap: () => router.go(AppScreen.settings),
                           child: Container(
@@ -46,10 +48,10 @@ class ChatsScreen extends StatelessWidget {
                     Container(
                       height: 42, padding: const EdgeInsets.symmetric(horizontal: 14),
                       decoration: BoxDecoration(color: C.field, borderRadius: BorderRadius.circular(13)),
-                      child: const Row(children: [
-                        Icon(Icons.search, size: 18, color: C.muted),
-                        SizedBox(width: 9),
-                        Text('Buscar', style: TextStyle(fontSize: 15, color: C.muted)),
+                      child: Row(children: [
+                        const Icon(Icons.search, size: 18, color: C.muted),
+                        const SizedBox(width: 9),
+                        Text(t.searchHint, style: const TextStyle(fontSize: 15, color: C.muted)),
                       ]),
                     ),
                   ],
@@ -85,6 +87,7 @@ class ChatsScreen extends StatelessWidget {
 }
 
 void _openNewMenu(BuildContext context) {
+  final t = S.of(context);
   showModalBottomSheet(
     context: context,
     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
@@ -93,17 +96,17 @@ void _openNewMenu(BuildContext context) {
         const SizedBox(height: 8),
         ListTile(
           leading: const Icon(Icons.chat_bubble_outline, color: C.accent),
-          title: const Text('Nuevo chat', style: TextStyle(fontWeight: FontWeight.w600)),
+          title: Text(t.newChat, style: const TextStyle(fontWeight: FontWeight.w600)),
           onTap: () { Navigator.pop(sheet); _askStartChat(context); },
         ),
         ListTile(
           leading: const Icon(Icons.groups_outlined, color: C.accent),
-          title: const Text('Nueva comunidad', style: TextStyle(fontWeight: FontWeight.w600)),
+          title: Text(t.newCommunity, style: const TextStyle(fontWeight: FontWeight.w600)),
           onTap: () { Navigator.pop(sheet); context.read<GroupController>().openCreate(); },
         ),
         ListTile(
           leading: const Icon(Icons.key_outlined, color: C.accent),
-          title: const Text('Unirme con código', style: TextStyle(fontWeight: FontWeight.w600)),
+          title: Text(t.joinWithCode, style: const TextStyle(fontWeight: FontWeight.w600)),
           onTap: () { Navigator.pop(sheet); _askJoinCode(context); },
         ),
         const SizedBox(height: 8),
@@ -114,27 +117,27 @@ void _openNewMenu(BuildContext context) {
 
 void _askStartChat(BuildContext context) {
   final chat = context.read<ChatController>();
+  final t = S.of(context);
   _askInput(
     context,
-    title: 'Nuevo chat',
-    hint: 'Teléfono (solo dígitos)',
-    action: 'Abrir chat',
+    title: t.newChat,
+    hint: t.newChatHint,
+    action: t.newChatAction,
     keyboard: TextInputType.phone,
-    onSubmit: (v) async =>
-        await chat.startChat(v) ? null : 'No hay ningún usuario con ese número',
+    onSubmit: (v) async => await chat.startChat(v) ? null : t.newChatError,
   );
 }
 
 void _askJoinCode(BuildContext context) {
   final chat = context.read<ChatController>();
+  final t = S.of(context);
   _askInput(
     context,
-    title: 'Unirme a una comunidad',
-    hint: 'Código de invitación',
-    action: 'Unirme',
+    title: t.joinTitle,
+    hint: t.joinHint,
+    action: t.joinAction,
     keyboard: TextInputType.text,
-    onSubmit: (v) async =>
-        await chat.joinInvite(v) ? null : 'Código inválido o caducado',
+    onSubmit: (v) async => await chat.joinInvite(v) ? null : t.joinError,
   );
 }
 
@@ -156,7 +159,7 @@ void _askInput(BuildContext context,
           decoration: InputDecoration(hintText: hint, errorText: error),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(dialog), child: const Text('Cancelar')),
+          TextButton(onPressed: () => Navigator.pop(dialog), child: Text(S.of(context).cancel)),
           TextButton(
             onPressed: busy ? null : () async {
               if (field.text.trim().isEmpty) return;
@@ -241,6 +244,7 @@ class _BottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final router = context.read<AppRouter>();
+    final t = S.of(context);
     Widget item(IconData icon, String label, bool active, VoidCallback? onTap) => Expanded(
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
@@ -260,10 +264,10 @@ class _BottomNav extends StatelessWidget {
         border: Border(top: BorderSide(color: Color(0xFFEEEFF2))),
       ),
       child: Row(children: [
-        item(Icons.chat_bubble, 'Chats', true, null),
-        item(Icons.groups_outlined, 'Grupos', false, () => context.read<GroupController>().openCreate()),
-        item(Icons.call_outlined, 'Llamadas', false, null),
-        item(Icons.settings_outlined, 'Ajustes', false, () => router.go(AppScreen.settings)),
+        item(Icons.chat_bubble, t.navChats, true, null),
+        item(Icons.groups_outlined, t.navGroups, false, () => context.read<GroupController>().openCreate()),
+        item(Icons.call_outlined, t.navCalls, false, null),
+        item(Icons.settings_outlined, t.navSettings, false, () => router.go(AppScreen.settings)),
       ]),
     );
   }

@@ -25,18 +25,10 @@ abstract final class Perm {
   static final admin = BigInt.one << 10;
   static final all = (BigInt.one << 11) - BigInt.one;
 
-  static final labels = <(BigInt, String)>[
-    (viewChannel, 'Ver canales'),
-    (sendMessages, 'Enviar mensajes'),
-    (manageMessages, 'Gestionar mensajes'),
-    (manageChannels, 'Gestionar canales'),
-    (manageRoles, 'Gestionar roles'),
-    (kickMembers, 'Expulsar miembros'),
-    (manageInvites, 'Crear invitaciones'),
-    (voiceConnect, 'Conectarse a voz'),
-    (voiceSpeak, 'Hablar en voz'),
-    (voiceMuteMembers, 'Silenciar a otros'),
-    (admin, 'Administrador'),
+  /// Orden de presentación; los textos localizados viven en la UI.
+  static final bits = <BigInt>[
+    viewChannel, sendMessages, manageMessages, manageChannels, manageRoles,
+    kickMembers, manageInvites, voiceConnect, voiceSpeak, voiceMuteMembers, admin,
   ];
 }
 

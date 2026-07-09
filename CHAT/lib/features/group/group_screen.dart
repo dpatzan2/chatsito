@@ -4,6 +4,7 @@ import '../../core/theme/app_colors.dart';
 import '../../domain/models/community.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/repositories/chat_repository.dart';
+import '../../l10n/app_localizations.dart';
 import '../chat/chat_controller.dart';
 import 'call_controller.dart';
 import 'group_controller.dart';
@@ -17,6 +18,7 @@ class GroupScreen extends StatelessWidget {
     final call = context.watch<CallController>();
     final community = context.watch<ChatRepository>().activeCommunity;
     final myId = context.watch<AuthRepository>().user.id;
+    final t = S.of(context);
     return Container(
       color: C.ink,
       child: Column(
@@ -48,10 +50,10 @@ class GroupScreen extends StatelessWidget {
                   child: const Icon(Icons.groups, color: Colors.white, size: 28),
                 ),
                 const SizedBox(height: 12),
-                Text(community?.name ?? 'Comunidad',
+                Text(community?.name ?? t.communityFallback,
                     style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: -.3)),
                 const SizedBox(height: 5),
-                Text('${community?.members.length ?? 0} miembros',
+                Text(t.membersCount(community?.members.length ?? 0),
                     style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: .7))),
               ],
             ),
@@ -60,9 +62,9 @@ class GroupScreen extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(14, 20, 14, 30),
               children: [
-                _label('Canales de texto'),
+                _label(t.textChannels),
                 for (final ch in community?.textChannels ?? const <Channel>[]) _textChannel(context, chat, ch),
-                _label('Canales de voz'),
+                _label(t.voiceChannels),
                 for (final ch in community?.voiceChannels ?? const <Channel>[]) _voiceChannel(context, call, ch),
               ],
             ),
@@ -116,6 +118,7 @@ class GroupScreen extends StatelessWidget {
 
   Widget _voiceChannel(BuildContext context, CallController call, Channel ch) {
     final members = call.membersOf(ch.id);
+    final t = S.of(context);
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => call.openCall(ch),
@@ -128,7 +131,7 @@ class GroupScreen extends StatelessWidget {
               const Icon(Icons.volume_up_outlined, size: 18, color: Color(0xFF7E8190)),
               const SizedBox(width: 10),
               Expanded(child: Text(ch.name, style: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.w600, color: Color(0xFFC7CAD3)))),
-              Text(members.isEmpty ? 'Vacío' : '${members.length} conectados',
+              Text(members.isEmpty ? t.voiceEmpty : t.voiceConnected(members.length),
                   style: const TextStyle(fontSize: 12, color: Color(0xFF7E8190), fontWeight: FontWeight.w600)),
             ]),
             if (members.isNotEmpty)

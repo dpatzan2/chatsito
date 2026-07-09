@@ -4,6 +4,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/widgets/primary_button.dart';
 import '../../domain/models/community.dart';
 import '../../domain/repositories/chat_repository.dart';
+import '../../l10n/app_localizations.dart';
 import 'group_controller.dart';
 
 const _palette = <Color>[
@@ -66,11 +67,26 @@ class _RoleEditScreenState extends State<RoleEditScreen> {
     gc.closeRoleEdit();
   }
 
+  String _permLabel(S t, BigInt bit) {
+    if (bit == Perm.viewChannel) return t.permViewChannel;
+    if (bit == Perm.sendMessages) return t.permSendMessages;
+    if (bit == Perm.manageMessages) return t.permManageMessages;
+    if (bit == Perm.manageChannels) return t.permManageChannels;
+    if (bit == Perm.manageRoles) return t.permManageRoles;
+    if (bit == Perm.kickMembers) return t.permKickMembers;
+    if (bit == Perm.manageInvites) return t.permManageInvites;
+    if (bit == Perm.voiceConnect) return t.permVoiceConnect;
+    if (bit == Perm.voiceSpeak) return t.permVoiceSpeak;
+    if (bit == Perm.voiceMuteMembers) return t.permVoiceMuteMembers;
+    return t.permAdmin;
+  }
+
   @override
   Widget build(BuildContext context) {
     final gc = context.read<GroupController>();
     final community = context.watch<ChatRepository>().activeCommunity;
     final everyone = _role?.isEveryone ?? false;
+    final t = S.of(context);
     return Container(
       color: C.ink,
       child: Column(children: [
@@ -81,7 +97,7 @@ class _RoleEditScreenState extends State<RoleEditScreen> {
                 onPressed: gc.closeRoleEdit,
                 icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: Colors.white)),
             Expanded(
-                child: Text(_role == null ? 'Nuevo rol' : _role!.name,
+                child: Text(_role == null ? t.newRole : _role!.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -97,20 +113,20 @@ class _RoleEditScreenState extends State<RoleEditScreen> {
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),
             children: [
               if (!everyone) ...[
-                _label('Nombre'),
+                _label(t.roleNameLabel),
                 TextField(
                   controller: _name,
                   style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-                  decoration: const InputDecoration(
-                    hintText: 'Nombre del rol',
-                    hintStyle: TextStyle(color: Color(0xFF7E8190)),
+                  decoration: InputDecoration(
+                    hintText: t.roleNameHint,
+                    hintStyle: const TextStyle(color: Color(0xFF7E8190)),
                     enabledBorder:
-                        UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF3A3D49))),
+                        const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF3A3D49))),
                     focusedBorder:
-                        UnderlineInputBorder(borderSide: BorderSide(color: C.accent)),
+                        const UnderlineInputBorder(borderSide: BorderSide(color: C.accent)),
                   ),
                 ),
-                _label('Color'),
+                _label(t.roleColor),
                 Wrap(spacing: 10, runSpacing: 10, children: [
                   for (final c in _palette)
                     GestureDetector(
@@ -127,20 +143,20 @@ class _RoleEditScreenState extends State<RoleEditScreen> {
                     ),
                 ]),
               ],
-              _label('Permisos'),
-              for (final (bit, label) in Perm.labels)
+              _label(t.rolePermissions),
+              for (final bit in Perm.bits)
                 SwitchListTile(
                   value: _perms & bit == bit,
                   onChanged: (v) =>
                       setState(() => _perms = v ? (_perms | bit) : (_perms & ~bit)),
-                  title: Text(label,
+                  title: Text(_permLabel(t, bit),
                       style: const TextStyle(fontSize: 14.5, color: Color(0xFFC7CAD3))),
                   activeTrackColor: C.accent,
                   contentPadding: EdgeInsets.zero,
                   dense: true,
                 ),
               if (_role != null && !everyone && community != null) ...[
-                _label('Miembros'),
+                _label(t.roleMembers),
                 for (final m in community.members)
                   CheckboxListTile(
                     value: m.roleIds.contains(_role!.id),
@@ -156,7 +172,7 @@ class _RoleEditScreenState extends State<RoleEditScreen> {
                   ),
               ],
               const SizedBox(height: 20),
-              PrimaryButton(_role == null ? 'Crear rol' : 'Guardar', _save, height: 52),
+              PrimaryButton(_role == null ? t.createRoleCta : t.saveRole, _save, height: 52),
             ],
           ),
         ),
