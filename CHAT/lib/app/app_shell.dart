@@ -26,21 +26,29 @@ class AppShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screen = context.watch<AppRouter>().screen;
+    final router = context.watch<AppRouter>();
+    final screen = router.screen;
     return Scaffold(
-      backgroundColor: C.field,
+      backgroundColor: router.isDark ? const Color(0xFF0E0D16) : C.field,
       body: SafeArea(
         bottom: false,
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
-          transitionBuilder: (child, anim) => FadeTransition(
-            opacity: anim,
-            child: SlideTransition(
-              position: Tween(begin: const Offset(.04, 0), end: Offset.zero).animate(anim),
-              child: child,
+        // ponytail: en ventanas anchas la app vive en una columna tipo teléfono;
+        // layout master-detail real si algún día se quiere aprovechar el ancho
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (child, anim) => FadeTransition(
+                opacity: anim,
+                child: SlideTransition(
+                  position: Tween(begin: const Offset(.04, 0), end: Offset.zero).animate(anim),
+                  child: child,
+                ),
+              ),
+              child: KeyedSubtree(key: ValueKey(screen), child: _screenFor(screen)),
             ),
           ),
-          child: KeyedSubtree(key: ValueKey(screen), child: _screenFor(screen)),
         ),
       ),
     );

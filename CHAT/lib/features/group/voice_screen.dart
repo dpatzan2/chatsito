@@ -54,18 +54,22 @@ class VoiceScreen extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(30, 24, 30, 44),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _control(call.muted ? Icons.mic_off : Icons.mic_none, call.muted ? C.danger : Colors.white.withValues(alpha: .14), call.toggleMute),
-                const SizedBox(width: 18),
-                _control(Icons.videocam_outlined, Colors.white.withValues(alpha: .14), () {}),
-                const SizedBox(width: 18),
-                _control(Icons.volume_up_outlined, Colors.white.withValues(alpha: .14), () {}),
-                const SizedBox(width: 18),
-                _control(Icons.call_end, C.danger, call.leave, shadow: true),
-              ],
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 44),
+            // scaleDown: los 4 controles caben también en pantallas de 320px
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _control(call.muted ? Icons.mic_off : Icons.mic_none, call.muted ? C.danger : Colors.white.withValues(alpha: .14), call.toggleMute),
+                  const SizedBox(width: 18),
+                  _control(Icons.videocam_outlined, Colors.white.withValues(alpha: .14), () {}),
+                  const SizedBox(width: 18),
+                  _control(Icons.volume_up_outlined, Colors.white.withValues(alpha: .14), () {}),
+                  const SizedBox(width: 18),
+                  _control(Icons.call_end, C.danger, call.leave, shadow: true),
+                ],
+              ),
             ),
           ),
         ],

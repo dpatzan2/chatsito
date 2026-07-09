@@ -56,8 +56,8 @@ class InviteScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: const TextStyle(fontSize: 23, fontWeight: FontWeight.w800, color: C.ink, letterSpacing: -.3)),
                 const SizedBox(height: 12),
-                SizedBox(
-                  width: 280,
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 280),
                   child: Text(
                     communityInvite
                         ? 'Comparte este código: en Chatsito, "Unirme con código". Caduca en 7 días.'
