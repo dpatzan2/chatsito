@@ -8,6 +8,8 @@ import '../../domain/models/message.dart';
 
 Color colorFromHex(String hex) => Color(int.parse(hex.substring(1), radix: 16) | 0xFF000000);
 
+String hexOf(Color c) => '#${(c.toARGB32() & 0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
+
 String initialsOf(String name) {
   final words = name.trim().split(RegExp(r'\s+')).where((w) => w.isNotEmpty);
   if (words.isEmpty) return '?';
@@ -96,12 +98,24 @@ Community communityFromWire(Map<String, dynamic> j) {
           unread: (ch['unread'] as int?) ?? 0,
         ),
     ],
+    roles: [
+      for (final r in (j['roles'] as List? ?? const []))
+        Role(
+          id: r['id'] as String,
+          name: r['name'] as String,
+          color: r['color'] == null ? null : colorFromHex(r['color'] as String),
+          position: (r['position'] as int?) ?? 1,
+          permissions: BigInt.parse(r['permissions'] as String),
+          isEveryone: (r['isEveryone'] as bool?) ?? false,
+        ),
+    ],
     members: [
       for (final m in (j['members'] as List? ?? const []))
         Member(
           id: m['id'] as String,
           name: (m['displayName'] as String?) ?? formatPhone(m['phone'] as String),
           color: colorFromHex((m['avatarColor'] as String?) ?? '#7C5CFF'),
+          roleIds: [for (final id in (m['roleIds'] as List? ?? const [])) id as String],
         ),
     ],
   );

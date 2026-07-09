@@ -1,3 +1,5 @@
+import 'dart:ui' show Color;
+
 import '../core/theme/app_colors.dart';
 import '../domain/models/chat_target.dart';
 import '../domain/models/community.dart';
@@ -58,6 +60,7 @@ class InMemoryChatRepository extends ChatRepository {
         Channel(id: 'ch-general', communityId: 'demo', name: 'general', type: 'text'),
         Channel(id: 'ch-voz', communityId: 'demo', name: 'Sala general', type: 'voice'),
       ],
+      roles: const [],
       members: const [],
     );
     notifyListeners();
@@ -88,6 +91,19 @@ class InMemoryChatRepository extends ChatRepository {
 
   @override
   Future<bool> joinInvite(String code) async => false;
+
+  @override
+  Future<void> createRole(String name, Color? color, BigInt permissions) async {}
+
+  @override
+  Future<void> updateRole(String roleId,
+      {String? name, Color? color, BigInt? permissions}) async {}
+
+  @override
+  Future<void> deleteRole(String roleId) async {}
+
+  @override
+  Future<void> setMemberRole(String userId, String roleId, {required bool assign}) async {}
 
   @override
   Future<void> sendText(String text) async {

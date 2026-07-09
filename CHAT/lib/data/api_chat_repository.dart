@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:ui' show Color;
+
 import '../core/theme/app_colors.dart';
 import '../domain/models/chat_target.dart';
 import '../domain/models/community.dart';
@@ -197,6 +199,48 @@ class ApiChatRepository extends ChatRepository {
     } on ApiException {
       return false;
     }
+  }
+
+  @override
+  Future<void> createRole(String name, Color? color, BigInt permissions) async {
+    final c = _activeCommunity;
+    if (c == null) return;
+    await _api.send('POST', '/communities/${c.id}/roles', body: {
+      'name': name,
+      if (color != null) 'color': hexOf(color),
+      'permissions': permissions.toString(),
+    });
+    await openCommunity(c.id);
+  }
+
+  @override
+  Future<void> updateRole(String roleId,
+      {String? name, Color? color, BigInt? permissions}) async {
+    final c = _activeCommunity;
+    if (c == null) return;
+    await _api.send('PATCH', '/communities/${c.id}/roles/$roleId', body: {
+      if (name != null && name.isNotEmpty) 'name': name,
+      if (color != null) 'color': hexOf(color),
+      if (permissions != null) 'permissions': permissions.toString(),
+    });
+    await openCommunity(c.id);
+  }
+
+  @override
+  Future<void> deleteRole(String roleId) async {
+    final c = _activeCommunity;
+    if (c == null) return;
+    await _api.send('DELETE', '/communities/${c.id}/roles/$roleId');
+    await openCommunity(c.id);
+  }
+
+  @override
+  Future<void> setMemberRole(String userId, String roleId, {required bool assign}) async {
+    final c = _activeCommunity;
+    if (c == null) return;
+    await _api.send(
+        assign ? 'PUT' : 'DELETE', '/communities/${c.id}/members/$userId/roles/$roleId');
+    await openCommunity(c.id);
   }
 
   @override

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../../app/app_router.dart';
+import '../../domain/models/community.dart';
 import '../../domain/models/contact.dart';
 import '../../domain/repositories/chat_repository.dart';
 
@@ -37,6 +38,19 @@ class GroupController extends ChangeNotifier {
     _router.go(AppScreen.invite);
     notifyListeners();
   }
+
+  Role? editingRole; // null = creando uno nuevo
+
+  void openRoles() => _router.go(AppScreen.roles);
+
+  void openRole(Role? role) {
+    editingRole = role;
+    _router.go(AppScreen.roleEdit);
+    notifyListeners();
+  }
+
+  void closeRoleEdit() => _router.go(AppScreen.roles);
+  void closeRoles() => _router.go(AppScreen.group);
 
   void closeInvite() {
     final to = inviteCode.isEmpty ? AppScreen.settings : AppScreen.group;

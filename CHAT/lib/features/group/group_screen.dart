@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../domain/models/community.dart';
+import '../../domain/repositories/auth_repository.dart';
 import '../../domain/repositories/chat_repository.dart';
 import '../chat/chat_controller.dart';
 import 'call_controller.dart';
@@ -15,6 +16,7 @@ class GroupScreen extends StatelessWidget {
     final chat = context.read<ChatController>();
     final call = context.watch<CallController>();
     final community = context.watch<ChatRepository>().activeCommunity;
+    final myId = context.watch<AuthRepository>().user.id;
     return Container(
       color: C.ink,
       child: Column(
@@ -33,6 +35,10 @@ class GroupScreen extends StatelessWidget {
                 Row(children: [
                   _roundBtn(Icons.arrow_back_ios_new, () => context.read<GroupController>().back()),
                   const Spacer(),
+                  if (community != null && community.can(myId, Perm.manageRoles)) ...[
+                    _roundBtn(Icons.shield_outlined, () => context.read<GroupController>().openRoles()),
+                    const SizedBox(width: 10),
+                  ],
                   _roundBtn(Icons.person_add_alt_1, () => context.read<GroupController>().openInvite()),
                 ]),
                 const SizedBox(height: 16),

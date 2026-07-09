@@ -1,3 +1,5 @@
+import 'dart:ui' show Color;
+
 import 'package:flutter/foundation.dart';
 import '../models/chat_target.dart';
 import '../models/community.dart';
@@ -40,6 +42,12 @@ abstract class ChatRepository extends ChangeNotifier {
   /// Código de invitación de [activeCommunity].
   Future<String> createInvite();
   Future<bool> joinInvite(String code);
+
+  /// Gestión de roles de [activeCommunity]; el server valida permisos.
+  Future<void> createRole(String name, Color? color, BigInt permissions);
+  Future<void> updateRole(String roleId, {String? name, Color? color, BigInt? permissions});
+  Future<void> deleteRole(String roleId);
+  Future<void> setMemberRole(String userId, String roleId, {required bool assign});
 
   Future<void> sendText(String text);
   Future<void> sendMessage(Message message);
