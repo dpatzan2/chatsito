@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { and, asc, eq, gt, isNull } from 'drizzle-orm';
 import type { WebSocket } from 'ws';
 import { assertMember, deleteMessage, markRead, sendMessage } from '../chat/service.js';
-import { sendChannelMessage, channelRecipients } from '../community/channel-messages.js';
+import { markChannelRead, sendChannelMessage, channelRecipients } from '../community/channel-messages.js';
 import { memberPerms, requirePerm } from '../community/service.js';
 import { channels, conversations, messages } from '../db/schema.js';
 import { AppError } from '../core/errors.js';
@@ -86,10 +86,16 @@ export const handlers: Record<string, Handler> = {
   },
 
   'read.mark': async (ctx, d) => {
-    const { conversationId, messageId } = z.object({
-      conversationId: z.uuid(), messageId: z.string().min(1),
-    }).parse(d);
-    await markRead(ctx.deps.db, ctx.userId, conversationId, messageId);
+    const input = z.object({
+      conversationId: z.uuid().optional(),
+      channelId: z.uuid().optional(),
+      messageId: z.string().min(1),
+    }).refine((t) => !t.conversationId !== !t.channelId, 'exactly one target').parse(d);
+    if (input.channelId) {
+      await markChannelRead(ctx.deps.db, ctx.userId, input.channelId, input.messageId);
+    } else {
+      await markRead(ctx.deps.db, ctx.userId, input.conversationId!, input.messageId);
+    }
     ack(ctx.socket, ctx.seq);
   },
 

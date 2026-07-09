@@ -60,6 +60,13 @@ export const readStates = pgTable('read_states', {
   lastReadMessageId: text('last_read_message_id').notNull(),
 }, (t) => [primaryKey({ columns: [t.userId, t.conversationId] })]);
 
+export const channelReadStates = pgTable('channel_read_states', {
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  channelId: uuid('channel_id').notNull()
+    .references(() => channels.id, { onDelete: 'cascade' }),
+  lastReadMessageId: text('last_read_message_id').notNull(),
+}, (t) => [primaryKey({ columns: [t.userId, t.channelId] })]);
+
 export const communities = pgTable('communities', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
