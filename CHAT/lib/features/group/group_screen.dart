@@ -80,7 +80,6 @@ class GroupScreen extends StatelessWidget {
         child: Text(t.toUpperCase(), style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: Color(0xFF7E8190), letterSpacing: .6)),
       );
 
-  // ponytail: read-states de canal diferidos — sin badge de no-leídos por canal
   Widget _textChannel(BuildContext context, ChatController chat, Channel ch) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -90,7 +89,20 @@ class GroupScreen extends StatelessWidget {
         child: Row(children: [
           const Text('#', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Color(0xFF7E8190))),
           const SizedBox(width: 10),
-          Expanded(child: Text(ch.name, style: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.w600, color: Color(0xFFC7CAD3)))),
+          Expanded(child: Text(ch.name,
+              style: TextStyle(
+                  fontSize: 15.5, fontWeight: FontWeight.w600,
+                  color: ch.unread > 0 ? Colors.white : const Color(0xFFC7CAD3)))),
+          if (ch.unread > 0)
+            Container(
+              constraints: const BoxConstraints(minWidth: 20),
+              height: 20,
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(color: C.accent, borderRadius: BorderRadius.circular(10)),
+              child: Text('${ch.unread}',
+                  style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: Colors.white)),
+            ),
         ]),
       ),
     );
