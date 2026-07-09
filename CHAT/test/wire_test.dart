@@ -2,6 +2,8 @@ import 'package:chatsito/data/api/wire.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  setUpAll(() => wireLanguageOverride = 'es'); // no depender del locale de la máquina
+
   test('formatTime: hoy, ayer, día de semana, fecha', () {
     final now = DateTime(2026, 7, 7, 10, 0); // martes
     expect(formatTime(DateTime(2026, 7, 7, 9, 5), now: now), '9:05');

@@ -1,3 +1,5 @@
+import 'dart:ui' show PlatformDispatcher;
+
 import 'package:flutter/material.dart';
 import '../../core/utils/formatters.dart';
 import '../../domain/models/community.dart';
@@ -5,6 +7,66 @@ import '../../domain/models/conversation.dart';
 import '../../domain/models/message.dart';
 
 /// Mapeo entre el JSON del servidor y los modelos de dominio.
+
+/// ponytail: la capa de datos no tiene BuildContext — tabla propia por idioma;
+/// si crece, inyectar el l10n generado a los repos.
+class WireStrings {
+  final String yesterday, photo, video, docFallback, msgFallback,
+      community, online, channel, you, newCommunity;
+  final List<String> weekdays; // Lun..Dom
+  const WireStrings({
+    required this.yesterday,
+    required this.weekdays,
+    required this.photo,
+    required this.video,
+    required this.docFallback,
+    required this.msgFallback,
+    required this.community,
+    required this.online,
+    required this.channel,
+    required this.you,
+    required this.newCommunity,
+  });
+}
+
+const _wire = <String, WireStrings>{
+  'es': WireStrings(
+    yesterday: 'Ayer',
+    weekdays: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+    photo: 'Foto', video: 'Vídeo', docFallback: 'Documento',
+    msgFallback: '(mensaje)', community: 'Comunidad', online: 'en línea',
+    channel: 'canal', you: 'Tú', newCommunity: 'Nueva comunidad',
+  ),
+  'en': WireStrings(
+    yesterday: 'Yesterday',
+    weekdays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    photo: 'Photo', video: 'Video', docFallback: 'Document',
+    msgFallback: '(message)', community: 'Community', online: 'online',
+    channel: 'channel', you: 'You', newCommunity: 'New community',
+  ),
+  'pt': WireStrings(
+    yesterday: 'Ontem',
+    weekdays: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
+    photo: 'Foto', video: 'Vídeo', docFallback: 'Documento',
+    msgFallback: '(mensagem)', community: 'Comunidade', online: 'online',
+    channel: 'canal', you: 'Você', newCommunity: 'Nova comunidade',
+  ),
+  'fr': WireStrings(
+    yesterday: 'Hier',
+    weekdays: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+    photo: 'Photo', video: 'Vidéo', docFallback: 'Document',
+    msgFallback: '(message)', community: 'Communauté', online: 'en ligne',
+    channel: 'canal', you: 'Toi', newCommunity: 'Nouvelle communauté',
+  ),
+};
+
+/// Fijado en tests para no depender del locale de la máquina.
+String? wireLanguageOverride;
+
+WireStrings get wireStrings =>
+    _wire[wireLanguageOverride ??
+        PlatformDispatcher.instance.locale.languageCode] ??
+    _wire['es']!;
 
 Color colorFromHex(String hex) => Color(int.parse(hex.substring(1), radix: 16) | 0xFF000000);
 
@@ -23,8 +85,8 @@ String formatTime(DateTime t, {DateTime? now}) {
   final day = DateTime(t.year, t.month, t.day);
   final diff = today.difference(day).inDays;
   if (diff <= 0) return '${t.hour}:${t.minute.toString().padLeft(2, '0')}';
-  if (diff == 1) return 'Ayer';
-  if (diff < 7) return const ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'][t.weekday - 1];
+  if (diff == 1) return wireStrings.yesterday;
+  if (diff < 7) return wireStrings.weekdays[t.weekday - 1];
   return '${t.day}/${t.month}';
 }
 
@@ -40,7 +102,7 @@ Message messageFromWire(Map<String, dynamic> m, String myUserId) {
     'video' => Message.video(sender, id: id, time: time),
     'doc' => Message.doc(sender,
         docName: c['name'] as String?, docSize: c['size'] as String?, id: id, time: time),
-    _ => Message.text(sender, '(mensaje)', id: id, time: time),
+    _ => Message.text(sender, wireStrings.msgFallback, id: id, time: time),
   };
 }
 
@@ -48,7 +110,7 @@ Message messageFromWire(Map<String, dynamic> m, String myUserId) {
 Map<String, dynamic> wireContent(Message m) => switch (m.type) {
       MessageType.text => {'text': m.text ?? ''},
       MessageType.sticker => {'sticker': m.sticker ?? ''},
-      MessageType.doc => {'name': m.docName ?? 'documento', 'size': m.docSize ?? ''},
+      MessageType.doc => {'name': m.docName ?? wireStrings.docFallback, 'size': m.docSize ?? ''},
       MessageType.image || MessageType.video => {},
     };
 
@@ -58,9 +120,9 @@ String previewOf(Map<String, dynamic> m) {
   return switch (m['type']) {
     'text' => c['text'] as String? ?? '',
     'sticker' => c['sticker'] as String? ?? '',
-    'image' => '📷 Foto',
-    'video' => '🎬 Vídeo',
-    'doc' => '📄 ${c['name'] ?? 'Documento'}',
+    'image' => '📷 ${wireStrings.photo}',
+    'video' => '🎬 ${wireStrings.video}',
+    'doc' => '📄 ${c['name'] ?? wireStrings.docFallback}',
     _ => '',
   };
 }
