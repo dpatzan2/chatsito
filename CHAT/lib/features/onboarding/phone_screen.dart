@@ -52,7 +52,8 @@ class PhoneScreen extends StatelessWidget {
                           boxShadow: [BoxShadow(color: C.aOpacity(88), blurRadius: 0, spreadRadius: 4)],
                         ),
                         child: Row(children: [
-                          Text(c.phoneFormatted, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: C.ink, letterSpacing: .5)),
+                          Flexible(child: Text(c.phoneFormatted, maxLines: 1, overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: C.ink, letterSpacing: .5))),
                           Container(width: 2, height: 24, margin: const EdgeInsets.only(left: 3), color: C.accent),
                         ]),
                       ),

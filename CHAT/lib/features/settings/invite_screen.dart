@@ -38,8 +38,9 @@ class InviteScreen extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(6, 6, 12, 6),
             child: Row(children: [
               IconButton(onPressed: back, icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: C.accent)),
-              Text(communityInvite ? 'Invitar a la comunidad' : 'Invitar a un amigo',
-                  style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: C.ink)),
+              Expanded(child: Text(communityInvite ? 'Invitar a la comunidad' : 'Invitar a un amigo',
+                  maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: C.ink))),
             ]),
           ),
           Expanded(
@@ -85,12 +86,10 @@ class InviteScreen extends StatelessWidget {
                   ]),
                 ),
                 const SizedBox(height: 30),
-                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  shareIcon(Icons.chat_bubble_outline, const Color(0xFFE7F6F0), C.green, 'Mensaje'),
-                  const SizedBox(width: 30),
-                  shareIcon(Icons.mail_outline, const Color(0xFFEAF1FE), const Color(0xFF2A6FDB), 'Correo'),
-                  const SizedBox(width: 30),
-                  shareIcon(Icons.more_horiz, const Color(0xFFF0F0F4), C.sub, 'Más'),
+                Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+                  Flexible(child: shareIcon(Icons.chat_bubble_outline, const Color(0xFFE7F6F0), C.green, 'Mensaje')),
+                  Flexible(child: shareIcon(Icons.mail_outline, const Color(0xFFEAF1FE), const Color(0xFF2A6FDB), 'Correo')),
+                  Flexible(child: shareIcon(Icons.more_horiz, const Color(0xFFF0F0F4), C.sub, 'Más')),
                 ]),
               ]),
             ),

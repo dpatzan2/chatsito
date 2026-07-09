@@ -248,7 +248,7 @@ class _BottomNav extends StatelessWidget {
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Icon(icon, size: 24, color: active ? C.accent : const Color(0xFFA8AAB4)),
           const SizedBox(height: 4),
-          Text(label, style: TextStyle(fontSize: 10.5, fontWeight: active ? FontWeight.w700 : FontWeight.w600, color: active ? C.accent : const Color(0xFFA8AAB4))),
+          Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 10.5, fontWeight: active ? FontWeight.w700 : FontWeight.w600, color: active ? C.accent : const Color(0xFFA8AAB4))),
         ]),
       ),
     );

@@ -61,8 +61,8 @@ class ContactProfileScreen extends StatelessWidget {
               _section(margin: const EdgeInsets.fromLTRB(16, 16, 16, 0), child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                    Text('Multimedia y archivos', style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700, color: C.ink)),
+                  const Row(children: [
+                    Expanded(child: Text('Multimedia y archivos', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700, color: C.ink))),
                     Text('Ver todo ›', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: C.accent)),
                   ]),
                   const SizedBox(height: 12),
