@@ -6,6 +6,8 @@ import '../features/chat/chat_screen.dart';
 import '../features/chats/chats_screen.dart';
 import '../features/group/create_group_screen.dart';
 import '../features/group/group_screen.dart';
+import '../features/group/role_edit_screen.dart';
+import '../features/group/roles_screen.dart';
 import '../features/group/voice_screen.dart';
 import '../features/onboarding/otp_screen.dart';
 import '../features/onboarding/phone_screen.dart';
@@ -54,6 +56,8 @@ class AppShell extends StatelessWidget {
         AppScreen.createGroup => const CreateGroupScreen(),
         AppScreen.group => const GroupScreen(),
         AppScreen.voice => const VoiceScreen(),
+        AppScreen.roles => const RolesScreen(),
+        AppScreen.roleEdit => const RoleEditScreen(),
         AppScreen.settings => const SettingsScreen(),
         AppScreen.detail => const DetailScreen(),
         AppScreen.invite => const InviteScreen(),
