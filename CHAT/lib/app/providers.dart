@@ -29,16 +29,27 @@ class _AppProvidersState extends State<AppProviders> {
   final _api = ApiClient(defaultApiBase);
   late final _ws =
       WsClient(defaultApiBase.replaceFirst('http', 'ws'), () => _api.access ?? '');
+  final _router = AppRouter();
+  late final _auth = ApiAuthRepository(_api);
+  late final _chat = ApiChatRepository(_api, _ws, _auth);
+
+  @override
+  void initState() {
+    super.initState();
+    // sesión persistida: si el refresh sigue vivo, saltamos el onboarding
+    _auth.restore().then((ok) {
+      if (ok) _router.go(_auth.user.hasName ? AppScreen.chats : AppScreen.profile);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // ---- infrastructure ----
-        ChangeNotifierProvider(create: (_) => AppRouter()),
-        ChangeNotifierProvider<AuthRepository>(create: (_) => ApiAuthRepository(_api)),
-        ChangeNotifierProvider<ChatRepository>(
-            create: (c) => ApiChatRepository(_api, _ws, c.read<AuthRepository>())),
+        // ---- infrastructure (viven lo que la app; no se disponen) ----
+        ChangeNotifierProvider<AppRouter>.value(value: _router),
+        ChangeNotifierProvider<AuthRepository>.value(value: _auth),
+        ChangeNotifierProvider<ChatRepository>.value(value: _chat),
         ChangeNotifierProvider<SettingsRepository>(create: (_) => InMemorySettingsRepository()),
         // ---- feature controllers ----
         ChangeNotifierProvider(create: (c) => OnboardingController(c.read<AuthRepository>(), c.read<AppRouter>())),

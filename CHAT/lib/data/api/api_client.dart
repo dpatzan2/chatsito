@@ -30,15 +30,25 @@ Future<(int, String)> _ioHttp(
 }
 
 /// Cliente JSON con tokens. Reintenta una vez tras refrescar si el access caducó.
-/// ponytail: tokens solo en memoria — persistir (shared_preferences) si molesta re-loguear.
+/// La persistencia la hace quien escuche [onTokens] (este archivo sigue sin Flutter
+/// para que el smoke lo corra con `dart run`).
 class ApiClient {
   final String baseUrl;
   final HttpCall _http;
   String? access, refresh;
 
+  /// Avisa cuando cambian los tokens (login, refresh o expiración) para persistirlos.
+  void Function(String? access, String? refresh)? onTokens;
+
   ApiClient(this.baseUrl, {HttpCall? http}) : _http = http ?? _ioHttp;
 
   bool get loggedIn => access != null;
+
+  void setTokens(String? a, String? r) {
+    access = a;
+    refresh = r;
+    onTokens?.call(a, r);
+  }
 
   Future<dynamic> send(String method, String path,
       {Object? body, Map<String, String>? query}) async {
@@ -69,12 +79,10 @@ class ApiClient {
   Future<void> _refresh() async {
     final (status, text) = await _raw('POST', '/auth/refresh', {'refresh': refresh}, null);
     if (status >= 400) {
-      access = null;
-      refresh = null;
+      setTokens(null, null);
       return;
     }
     final json = jsonDecode(text) as Map<String, dynamic>;
-    access = json['access'] as String;
-    refresh = json['refresh'] as String;
+    setTokens(json['access'] as String, json['refresh'] as String);
   }
 }
