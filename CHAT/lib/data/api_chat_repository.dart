@@ -53,6 +53,7 @@ class ApiChatRepository extends ChatRepository {
             initials: initialsOf(c['name'] as String),
             color: C.accent,
             isGroup: true,
+            unread: (c['unread'] as int?) ?? 0,
           ),
         ..._oneToOnes,
       ];
@@ -109,13 +110,14 @@ class ApiChatRepository extends ChatRepository {
     ];
     _oneToOnes = [for (final x in _oneToOnes) x.id == c.id ? x.copyWith(unread: 0) : x];
     notifyListeners();
-    _markRead(c.id);
+    _markRead({'conversationId': c.id});
   }
 
-  void _markRead(String conversationId) {
+  Future<void> _markRead(Map<String, dynamic> target) async {
     final last = _messages.isEmpty ? null : _messages.last;
     if (last == null || last.id.isEmpty) return;
-    _ws.request('read.mark', {'conversationId': conversationId, 'messageId': last.id})
+    await _ws
+        .request('read.mark', {...target, 'messageId': last.id})
         .catchError((_) => <String, dynamic>{});
   }
 
@@ -145,6 +147,9 @@ class ApiChatRepository extends ChatRepository {
         messageFromWire((m as Map).cast<String, dynamic>(), _me),
     ];
     notifyListeners();
+    await _markRead({'channelId': ch.id});
+    await openCommunity(ch.communityId).catchError((_) {});
+    await refresh();
   }
 
   @override
@@ -301,15 +306,19 @@ class ApiChatRepository extends ChatRepository {
       _messages = [..._messages, messageFromWire(d, _me)];
       _peerTyping = false;
       notifyListeners();
-      if (d['conversationId'] != null && d['authorId'] != _me) {
-        _ws.request('read.mark', {
-          'conversationId': d['conversationId'],
-          'messageId': d['id'],
-        }).catchError((_) => <String, dynamic>{});
+      if (d['authorId'] != _me) {
+        final target = d['conversationId'] != null
+            ? {'conversationId': d['conversationId']}
+            : {'channelId': d['channelId']};
+        _ws
+            .request('read.mark', {...target, 'messageId': d['id']})
+            .catchError((_) => <String, dynamic>{});
       }
     }
     // ponytail: recarga las listas por mensaje; deltas locales si duele
     refresh();
+    final cid = _activeCommunity?.id;
+    if (d['channelId'] != null && cid != null) openCommunity(cid).catchError((_) {});
   }
 
   @override

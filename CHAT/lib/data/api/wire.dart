@@ -93,6 +93,7 @@ Community communityFromWire(Map<String, dynamic> j) {
           communityId: ch['communityId'] as String,
           name: ch['name'] as String,
           type: ch['type'] as String,
+          unread: (ch['unread'] as int?) ?? 0,
         ),
     ],
     members: [

@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 
 class Channel {
   final String id, communityId, name, type; // 'text' | 'voice'
-  const Channel({required this.id, required this.communityId, required this.name, required this.type});
+  final int unread;
+  const Channel({
+    required this.id, required this.communityId, required this.name, required this.type,
+    this.unread = 0,
+  });
   bool get isVoice => type == 'voice';
 }
 
