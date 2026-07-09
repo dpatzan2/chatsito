@@ -65,8 +65,20 @@ Future<void> main(List<String> args) async {
   await wsA.request('msg.send', {
     'channelId': general['id'], 'type': 'text', 'content': {'text': 'hola canal'},
   });
-  await gotCh;
+  final chMsg = await gotCh;
   ok('mensaje de canal llega a los miembros');
+
+  // unread de canal + read.mark
+  final commsB = await apiB.send('GET', '/communities') as List;
+  if (((commsB.first as Map)['unread'] as int) < 1) throw 'GET /communities sin unread';
+  Map chOf(Map det) =>
+      (det['channels'] as List).firstWhere((c) => c['id'] == general['id']) as Map;
+  final detB = await apiB.send('GET', '/communities/${comm['id']}') as Map;
+  if ((chOf(detB)['unread'] as int) < 1) throw 'canal sin unread';
+  await wsB.request('read.mark', {'channelId': general['id'], 'messageId': chMsg.d['id']});
+  final det2 = await apiB.send('GET', '/communities/${comm['id']}') as Map;
+  if ((chOf(det2)['unread'] as int) != 0) throw 'read.mark de canal no limpió';
+  ok('unread de canal y read.mark');
 
   // canal de voz + token LiveKit
   final voiceCh = await apiA.send('POST', '/communities/${comm['id']}/channels',

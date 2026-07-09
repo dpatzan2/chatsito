@@ -14,7 +14,8 @@ del servidor (`[DEV SMS] ...`).
 
 El front Flutter (`../CHAT`) se conecta a este server: ver su README para
 correr la app y el smoke end-to-end. `GET /users/lookup?phone=` busca un
-usuario por teléfono (para iniciar chats nuevos desde la app).
+usuario por teléfono (para iniciar chats nuevos desde la app; máx. 30
+consultas/min por usuario → `RATE_LIMITED`).
 
 ## Tests
 
@@ -36,7 +37,7 @@ Servidor→cliente: `{"v":1,"op":"...","ts":ms,"d":{...}}`.
 | `msg.send` | `{conversationId \| channelId, type, content}` | `sys.ack {id}` + `msg.new` a los destinatarios (canal: miembros con `VIEW_CHANNEL`) |
 | `msg.delete` | `{id}` | `sys.ack` + `msg.deleted {id, conversationId \| channelId}` |
 | `typing.start` | `{conversationId}` | `sys.ack`; `typing {conversationId, userId}` al otro |
-| `read.mark` | `{conversationId, messageId}` | `sys.ack` |
+| `read.mark` | `{conversationId \| channelId, messageId}` | `sys.ack` |
 | `sys.resume` | `{targets:[{conversationId \| channelId, lastMsgId}]}` | `sys.ack` + `sys.resumed {targets:[{..., messages}]}` |
 | `voice.join` | `{channelId}` | `sys.ack` + `voice.ready {channelId, token, url, members}` (token LiveKit, 10 min) |
 | `voice.leave` | `{channelId}` | `sys.ack`; LiveKit confirma con webhook → `voice.state` |

@@ -15,12 +15,16 @@ flutter run --dart-define=API_URL=http://10.0.2.2:3000   # emulador Android
 ```
 
 Sin Twilio configurado, el código OTP sale en la consola del server
-(`[DEV SMS] ...`). Los tokens viven solo en memoria: al reiniciar la app
-se vuelve a pedir el código.
+(`[DEV SMS] ...`). La sesión persiste entre reinicios (shared_preferences);
+solo se vuelve a pedir el código si el refresh token caduca.
 
 - **Nuevo chat**: botón ✏️ → *Nuevo chat* → teléfono del otro usuario.
 - **Comunidades**: ✏️ → *Nueva comunidad*; se invita con el código que genera
   el botón 👤+ del grupo, y se entra con *Unirme con código*.
+- **No leídos**: contador por conversación y por comunidad en la lista de
+  chats, y badge por canal dentro del grupo (`read.mark` al abrirlos).
+- **Roles**: el botón 🛡 del grupo (visible con permiso *Gestionar roles*)
+  lista los roles; se crean/editan con color, permisos y miembros.
 - **Voz**: tocar un canal de voz conecta al SFU de LiveKit (mic real);
   el mute propio apaga el micrófono, la ocupación llega por `voice.state`.
 
