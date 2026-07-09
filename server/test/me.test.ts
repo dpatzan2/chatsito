@@ -70,3 +70,15 @@ it('GET /users/lookup unknown phone → NOT_FOUND', async () => {
   });
   expect(res.statusCode).toBe(404);
 });
+
+it('GET /users/lookup rate limits per user → RATE_LIMITED 429', async () => {
+  let last = 200;
+  for (let i = 0; i < 40 && last !== 429; i++) {
+    const res = await app.inject({
+      method: 'GET', url: '/users/lookup?phone=50288888888',
+      headers: { authorization: `Bearer ${access}` },
+    });
+    last = res.statusCode;
+  }
+  expect(last).toBe(429);
+});
