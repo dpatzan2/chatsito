@@ -22,6 +22,13 @@
       "when": 1783430340778,
       "tag": "0002_bouncy_union_jack",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1783610680723,
+      "tag": "0003_great_maggott",
+      "breakpoints": true
     }
   ]
 }

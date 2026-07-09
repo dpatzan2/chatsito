@@ -1,7 +1,8 @@
 import { randomBytes } from 'node:crypto';
-import { and, asc, eq, inArray } from 'drizzle-orm';
+import { and, asc, eq, gt, inArray, isNull, ne, sql } from 'drizzle-orm';
 import {
-  channelOverrides, channels, communities, communityMembers, invites, memberRoles, roles, users,
+  channelOverrides, channelReadStates, channels, communities, communityMembers,
+  invites, memberRoles, messages, roles, users,
 } from '../db/schema.js';
 import { AppError } from '../core/errors.js';
 import { computePermissions, DEFAULT_EVERYONE, PERM, can } from '../core/permissions.js';
@@ -82,9 +83,30 @@ export async function createCommunity(db: Db, ownerId: string, name: string) {
   return getCommunity(db, community.id, ownerId);
 }
 
+// ponytail: un count por canal de texto; pasar a un solo GROUP BY si las comunidades crecen
+export async function channelUnreads(
+  db: Db, communityId: string, userId: string,
+): Promise<Map<string, number>> {
+  const chans = await db.select().from(channels).where(eq(channels.communityId, communityId));
+  const out = new Map<string, number>();
+  for (const ch of chans) {
+    if (ch.type !== 'text') continue;
+    const [rs] = await db.select().from(channelReadStates)
+      .where(and(eq(channelReadStates.userId, userId), eq(channelReadStates.channelId, ch.id)));
+    const [{ count }] = await db.select({ count: sql<number>`count(*)::int` }).from(messages)
+      .where(and(
+        eq(messages.channelId, ch.id), isNull(messages.deletedAt), ne(messages.authorId, userId),
+        ...(rs ? [gt(messages.id, rs.lastReadMessageId)] : []),
+      ));
+    out.set(ch.id, count);
+  }
+  return out;
+}
+
 export async function getCommunity(db: Db, communityId: string, userId: string) {
   await requireMember(db, communityId, userId);
   const [community] = await db.select().from(communities).where(eq(communities.id, communityId));
+  const unreads = await channelUnreads(db, communityId, userId);
   const chans = await db.select().from(channels)
     .where(eq(channels.communityId, communityId)).orderBy(asc(channels.position), asc(channels.createdAt));
   const rls = await db.select().from(roles)
@@ -102,7 +124,7 @@ export async function getCommunity(db: Db, communityId: string, userId: string) 
   }
   return {
     ...wireCommunity(community),
-    channels: chans.map(wireChannel),
+    channels: chans.map((ch) => ({ ...wireChannel(ch), unread: unreads.get(ch.id) ?? 0 })),
     roles: rls.map(wireRole),
     members: membs.map((m) => ({ ...publicUser(m.user), roleIds: rolesByUser.get(m.user.id) ?? [] })),
   };

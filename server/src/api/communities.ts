@@ -3,8 +3,8 @@ import { eq } from 'drizzle-orm';
 import type { FastifyInstance } from 'fastify';
 import { channels, communities, communityMembers } from '../db/schema.js';
 import {
-  createCommunity, getCommunity, communityMemberIds, createInvite, joinByInvite,
-  removeMember, requireMember, requirePerm,
+  channelUnreads, createCommunity, getCommunity, communityMemberIds, createInvite,
+  joinByInvite, removeMember, requireMember, requirePerm,
 } from '../community/service.js';
 import {
   createRole, updateRole, deleteRole, assignRole, unassignRole, setOverride,
@@ -33,7 +33,12 @@ export function communityRoutes(app: FastifyInstance, deps: Deps, hub: Hub): voi
     const rows = await deps.db.select({ community: communities }).from(communityMembers)
       .innerJoin(communities, eq(communities.id, communityMembers.communityId))
       .where(eq(communityMembers.userId, req.userId));
-    return rows.map((r) => wireCommunity(r.community));
+    return Promise.all(rows.map(async (r) => {
+      const unreads = await channelUnreads(deps.db, r.community.id, req.userId);
+      let total = 0;
+      for (const n of unreads.values()) total += n;
+      return { ...wireCommunity(r.community), unread: total };
+    }));
   });
 
   app.get('/communities/:id', async (req) => {

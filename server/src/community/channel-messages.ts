@@ -1,7 +1,8 @@
 import { ulid } from 'ulid';
 import { and, desc, eq, inArray, isNull, lt } from 'drizzle-orm';
 import {
-  channelOverrides, channels, communities, communityMembers, memberRoles, messages, roles,
+  channelOverrides, channelReadStates, channels, communities, communityMembers,
+  memberRoles, messages, roles,
 } from '../db/schema.js';
 import { AppError } from '../core/errors.js';
 import { computePermissions, PERM, can } from '../core/permissions.js';
@@ -48,6 +49,20 @@ export async function getChannelMessages(
     ))
     .orderBy(desc(messages.id))
     .limit(limit);
+}
+
+export async function markChannelRead(
+  db: Db, userId: string, channelId: string, messageId: string,
+): Promise<void> {
+  const channel = await getChannel(db, channelId);
+  await requirePerm(db, {
+    communityId: channel.communityId, userId, perm: PERM.VIEW_CHANNEL, channelId,
+  });
+  await db.insert(channelReadStates).values({ userId, channelId, lastReadMessageId: messageId })
+    .onConflictDoUpdate({
+      target: [channelReadStates.userId, channelReadStates.channelId],
+      set: { lastReadMessageId: messageId },
+    });
 }
 
 export async function channelRecipients(
