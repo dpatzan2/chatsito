@@ -25,7 +25,8 @@ class MessageBubble extends StatelessWidget {
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 280),
+        constraints: BoxConstraints(
+            maxWidth: (MediaQuery.sizeOf(context).width * .78).clamp(220.0, 320.0)),
         margin: const EdgeInsets.only(bottom: 8),
         padding: pad,
         decoration: BoxDecoration(

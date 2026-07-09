@@ -20,50 +20,60 @@ class WelcomeScreen extends StatelessWidget {
         ),
       ),
       padding: const EdgeInsets.fromLTRB(32, 56, 32, 44),
-      child: Column(
-        children: [
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 96, height: 96,
-                  decoration: BoxDecoration(
-                    color: C.accent,
-                    borderRadius: BorderRadius.circular(28),
-                    boxShadow: [BoxShadow(color: C.aOpacity(62), blurRadius: 40, offset: const Offset(0, 18))],
-                  ),
-                  child: const Icon(Icons.forum_rounded, size: 50, color: Colors.white),
-                ),
-                const SizedBox(height: 30),
-                const Text('Chatsito', style: TextStyle(fontSize: 34, fontWeight: FontWeight.w800, color: C.ink, letterSpacing: -.6)),
-                const SizedBox(height: 14),
-                const SizedBox(
-                  width: 250,
-                  child: Text('Mensajería privada para tu equipo. Chats, grupos, canales de voz y mucho más.',
-                    textAlign: TextAlign.center, style: TextStyle(fontSize: 16, height: 1.5, color: C.sub)),
-                ),
-              ],
-            ),
-          ),
-          PrimaryButton('Continuar con tu número', c.start),
-          const Padding(
-            padding: EdgeInsets.fromLTRB(4, 18, 4, 0),
-            child: Text.rich(
-              TextSpan(
-                style: TextStyle(fontSize: 11.5, height: 1.6, color: Color(0xFF9A9DA8)),
+      // scroll-seguro: en ventanas cortas la columna se desplaza en vez de desbordar
+      child: LayoutBuilder(
+        builder: (context, box) => SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: box.maxHeight),
+            child: IntrinsicHeight(
+              child: Column(
                 children: [
-                  TextSpan(text: 'Al continuar aceptas los '),
-                  TextSpan(text: 'Términos', style: TextStyle(color: C.accent, fontWeight: FontWeight.w600)),
-                  TextSpan(text: ' y la '),
-                  TextSpan(text: 'Política de privacidad', style: TextStyle(color: C.accent, fontWeight: FontWeight.w600)),
-                  TextSpan(text: ' de Chatsito.'),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 96, height: 96,
+                          decoration: BoxDecoration(
+                            color: C.accent,
+                            borderRadius: BorderRadius.circular(28),
+                            boxShadow: [BoxShadow(color: C.aOpacity(62), blurRadius: 40, offset: const Offset(0, 18))],
+                          ),
+                          child: const Icon(Icons.forum_rounded, size: 50, color: Colors.white),
+                        ),
+                        const SizedBox(height: 30),
+                        const Text('Chatsito', style: TextStyle(fontSize: 34, fontWeight: FontWeight.w800, color: C.ink, letterSpacing: -.6)),
+                        const SizedBox(height: 14),
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 250),
+                          child: const Text('Mensajería privada para tu equipo. Chats, grupos, canales de voz y mucho más.',
+                            textAlign: TextAlign.center, style: TextStyle(fontSize: 16, height: 1.5, color: C.sub)),
+                        ),
+                      ],
+                    ),
+                  ),
+                  PrimaryButton('Continuar con tu número', c.start),
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(4, 18, 4, 0),
+                    child: Text.rich(
+                      TextSpan(
+                        style: TextStyle(fontSize: 11.5, height: 1.6, color: Color(0xFF9A9DA8)),
+                        children: [
+                          TextSpan(text: 'Al continuar aceptas los '),
+                          TextSpan(text: 'Términos', style: TextStyle(color: C.accent, fontWeight: FontWeight.w600)),
+                          TextSpan(text: ' y la '),
+                          TextSpan(text: 'Política de privacidad', style: TextStyle(color: C.accent, fontWeight: FontWeight.w600)),
+                          TextSpan(text: ' de Chatsito.'),
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                 ],
               ),
-              textAlign: TextAlign.center,
             ),
           ),
-        ],
+        ),
       ),
     );
   }
