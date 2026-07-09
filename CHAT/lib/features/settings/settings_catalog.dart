@@ -1,3 +1,5 @@
+import '../../l10n/app_localizations.dart';
+
 /// Static definition of the settings detail screens (rows + toggles).
 class SettingRow {
   final String label, detail;
@@ -20,34 +22,35 @@ class SettingDetail {
   const SettingDetail(this.title, this.groups);
 }
 
-const settingsCatalog = <String, SettingDetail>{
-  'cuenta': SettingDetail('Cuenta', [
-    SettingGroup([SettingRow.nav('Número de teléfono', '+34 555 555 555'), SettingRow.nav('Cambiar número'), SettingRow.nav('Correo electrónico', 'Añadir')], header: 'Información'),
-    SettingGroup([SettingRow.nav('Solicitar información de mi cuenta')]),
-    SettingGroup([SettingRow.danger('Eliminar mi cuenta')]),
+/// Catálogo localizado; los detalles numéricos ('2,4 GB', 'v1.0.0'…) quedan literales.
+Map<String, SettingDetail> settingsCatalog(S t) => {
+  'cuenta': SettingDetail(t.setAccount, [
+    SettingGroup([SettingRow.nav(t.catPhoneNumber, '+34 555 555 555'), SettingRow.nav(t.catChangeNumber), SettingRow.nav(t.catEmail, t.catAdd)], header: t.catInfo),
+    SettingGroup([SettingRow.nav(t.catRequestInfo)]),
+    SettingGroup([SettingRow.danger(t.catDeleteAccount)]),
   ]),
-  'privacidad': SettingDetail('Privacidad', [
-    SettingGroup([SettingRow.nav('Última vez y en línea', 'Todos'), SettingRow.nav('Foto de perfil', 'Mis contactos'), SettingRow.nav('Estado', 'Mis contactos')], header: 'Quién puede ver mi info'),
-    SettingGroup([SettingRow.toggle('readReceipts', 'Confirmaciones de lectura'), SettingRow.nav('Contactos bloqueados', '3')]),
-    SettingGroup([SettingRow.toggle('screenLock', 'Bloqueo con código'), SettingRow.nav('Mensajes temporales', 'Desactivado')]),
+  'privacidad': SettingDetail(t.setPrivacy, [
+    SettingGroup([SettingRow.nav(t.catLastSeen, t.catEveryone), SettingRow.nav(t.catProfilePhoto, t.catMyContacts), SettingRow.nav(t.catStatus, t.catMyContacts)], header: t.catWhoCanSee),
+    SettingGroup([SettingRow.toggle('readReceipts', t.catReadReceipts), SettingRow.nav(t.catBlocked, '3')]),
+    SettingGroup([SettingRow.toggle('screenLock', t.catScreenLock), SettingRow.nav(t.tempMessages, t.disabled)]),
   ]),
-  'chats': SettingDetail('Chats', [
-    SettingGroup([SettingRow.nav('Tema', 'Claro'), SettingRow.nav('Fondo de pantalla'), SettingRow.nav('Tamaño de fuente', 'Mediano')], header: 'Pantalla'),
-    SettingGroup([SettingRow.toggle('enterToSend', 'Tecla Enter para enviar'), SettingRow.toggle('saveToRoll', 'Guardar en el carrete')]),
-    SettingGroup([SettingRow.nav('Copia de seguridad', 'Hoy, 9:00'), SettingRow.nav('Historial de chats')], header: 'Copia de seguridad'),
+  'chats': SettingDetail(t.setChats, [
+    SettingGroup([SettingRow.nav(t.catTheme, t.catLight), SettingRow.nav(t.catWallpaper), SettingRow.nav(t.catFontSize, t.catMedium)], header: t.catDisplay),
+    SettingGroup([SettingRow.toggle('enterToSend', t.catEnterToSend), SettingRow.toggle('saveToRoll', t.catSaveToRoll)]),
+    SettingGroup([SettingRow.nav(t.catBackup, 'Hoy, 9:00'), SettingRow.nav(t.catChatHistory)], header: t.catBackup),
   ]),
-  'notif': SettingDetail('Notificaciones', [
-    SettingGroup([SettingRow.toggle('msgNotif', 'Mostrar notificaciones'), SettingRow.nav('Tono', 'Nota'), SettingRow.nav('Vibración', 'Predeterminada')], header: 'Mensajes'),
-    SettingGroup([SettingRow.toggle('groupNotif', 'Mostrar notificaciones'), SettingRow.nav('Tono', 'Nota')], header: 'Grupos'),
-    SettingGroup([SettingRow.toggle('showPreview', 'Mostrar vista previa'), SettingRow.toggle('reactionNotif', 'Notificar reacciones')]),
+  'notif': SettingDetail(t.setNotifications, [
+    SettingGroup([SettingRow.toggle('msgNotif', t.catShowNotifications), SettingRow.nav(t.catTone, 'Nota'), SettingRow.nav(t.catVibration, t.catDefault)], header: t.catMessages),
+    SettingGroup([SettingRow.toggle('groupNotif', t.catShowNotifications), SettingRow.nav(t.catTone, 'Nota')], header: t.navGroups),
+    SettingGroup([SettingRow.toggle('showPreview', t.catShowPreview), SettingRow.toggle('reactionNotif', t.catNotifyReactions)]),
   ]),
-  'storage': SettingDetail('Almacenamiento y datos', [
-    SettingGroup([SettingRow.nav('Administrar almacenamiento', '2,4 GB')]),
-    SettingGroup([SettingRow.nav('Con datos móviles', 'Fotos'), SettingRow.nav('Con Wi-Fi', 'Todo')], header: 'Descarga automática'),
-    SettingGroup([SettingRow.nav('Ver uso de red'), SettingRow.toggle('lessData', 'Usar menos datos en llamadas')], header: 'Uso de la red'),
+  'storage': SettingDetail(t.setStorage, [
+    SettingGroup([SettingRow.nav(t.catManageStorage, '2,4 GB')]),
+    SettingGroup([SettingRow.nav(t.catOnMobile, t.catPhotos), SettingRow.nav(t.catOnWifi, t.catAll)], header: t.catAutoDownload),
+    SettingGroup([SettingRow.nav(t.catViewNetwork), SettingRow.toggle('lessData', t.catLessData)], header: t.catNetworkUsage),
   ]),
-  'ayuda': SettingDetail('Ayuda', [
-    SettingGroup([SettingRow.nav('Centro de ayuda'), SettingRow.nav('Contáctanos'), SettingRow.nav('Términos y Política de privacidad')]),
-    SettingGroup([SettingRow.nav('Información de la app', 'v1.0.0')]),
+  'ayuda': SettingDetail(t.setHelp, [
+    SettingGroup([SettingRow.nav(t.catHelpCenter), SettingRow.nav(t.catContactUs), SettingRow.nav(t.catTermsPrivacy)]),
+    SettingGroup([SettingRow.nav(t.catAppInfo, 'v1.0.0')]),
   ]),
 };

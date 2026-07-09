@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/primary_button.dart';
 import '../../domain/repositories/auth_repository.dart';
+import '../../l10n/app_localizations.dart';
 import '../group/group_controller.dart';
 import 'settings_controller.dart';
 
@@ -19,6 +20,7 @@ class InviteScreen extends StatelessWidget {
     final communityInvite = gc.inviteCode.isNotEmpty;
     final code = communityInvite ? gc.inviteCode : context.watch<AuthRepository>().user.inviteCode;
     final back = gc.closeInvite;
+    final t = S.of(context);
 
     Widget shareIcon(IconData icon, Color bg, Color fg, String label) => Column(
       mainAxisSize: MainAxisSize.min,
@@ -38,7 +40,7 @@ class InviteScreen extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(6, 6, 12, 6),
             child: Row(children: [
               IconButton(onPressed: back, icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: C.accent)),
-              Expanded(child: Text(communityInvite ? 'Invitar a la comunidad' : 'Invitar a un amigo',
+              Expanded(child: Text(communityInvite ? t.inviteCommunityTitle : t.inviteFriendTitle,
                   maxLines: 1, overflow: TextOverflow.ellipsis,
                   style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: C.ink))),
             ]),
@@ -53,16 +55,14 @@ class InviteScreen extends StatelessWidget {
                   child: const Icon(Icons.person_add_alt_1_outlined, color: C.accent, size: 44),
                 ),
                 const SizedBox(height: 6),
-                Text(communityInvite ? 'Invita gente a la comunidad' : 'Invita a tu equipo a Chatsito',
+                Text(communityInvite ? t.inviteCommunityHeading : t.inviteFriendHeading,
                     textAlign: TextAlign.center,
                     style: const TextStyle(fontSize: 23, fontWeight: FontWeight.w800, color: C.ink, letterSpacing: -.3)),
                 const SizedBox(height: 12),
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 280),
                   child: Text(
-                    communityInvite
-                        ? 'Comparte este código: en Chatsito, "Unirme con código". Caduca en 7 días.'
-                        : 'Comparte tu enlace personal. Cuando se unan, los verás en tus chats al instante.',
+                    communityInvite ? t.inviteCommunityCopy : t.inviteFriendCopy,
                     textAlign: TextAlign.center, style: const TextStyle(fontSize: 14.5, height: 1.5, color: C.sub)),
                 ),
                 const SizedBox(height: 28),
@@ -80,23 +80,23 @@ class InviteScreen extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                         decoration: BoxDecoration(color: C.tint(86), borderRadius: BorderRadius.circular(10)),
-                        child: const Text('Copiar', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: C.accent)),
+                        child: Text(t.copyAction, style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: C.accent)),
                       ),
                     ),
                   ]),
                 ),
                 const SizedBox(height: 30),
                 Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-                  Flexible(child: shareIcon(Icons.chat_bubble_outline, const Color(0xFFE7F6F0), C.green, 'Mensaje')),
-                  Flexible(child: shareIcon(Icons.mail_outline, const Color(0xFFEAF1FE), const Color(0xFF2A6FDB), 'Correo')),
-                  Flexible(child: shareIcon(Icons.more_horiz, const Color(0xFFF0F0F4), C.sub, 'Más')),
+                  Flexible(child: shareIcon(Icons.chat_bubble_outline, const Color(0xFFE7F6F0), C.green, t.shareMessage)),
+                  Flexible(child: shareIcon(Icons.mail_outline, const Color(0xFFEAF1FE), const Color(0xFF2A6FDB), t.shareEmail)),
+                  Flexible(child: shareIcon(Icons.more_horiz, const Color(0xFFF0F0F4), C.sub, t.shareMore)),
                 ]),
               ]),
             ),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(28, 0, 28, 30),
-            child: PrimaryButton(communityInvite ? 'Listo' : 'Compartir enlace', back, height: 54),
+            child: PrimaryButton(communityInvite ? t.done : t.shareLink, back, height: 54),
           ),
         ],
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_toggle.dart';
+import '../../l10n/app_localizations.dart';
 import 'settings_catalog.dart';
 import 'settings_controller.dart';
 
@@ -11,7 +12,8 @@ class DetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.watch<SettingsController>();
-    final detail = settingsCatalog[c.detailKey] ?? settingsCatalog['cuenta']!;
+    final catalog = settingsCatalog(S.of(context));
+    final detail = catalog[c.detailKey] ?? catalog['cuenta']!;
     return Container(
       color: C.field,
       child: Column(
@@ -29,7 +31,7 @@ class DetailScreen extends StatelessWidget {
                     child: TextButton.icon(
                       onPressed: c.backToSettings,
                       icon: const Icon(Icons.arrow_back_ios_new, size: 16, color: C.accent),
-                      label: const Text('Ajustes', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: C.accent)),
+                      label: Text(S.of(context).settingsTitle, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: C.accent)),
                     ),
                   ),
                   Text(detail.title, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: C.ink)),

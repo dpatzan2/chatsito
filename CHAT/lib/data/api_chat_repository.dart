@@ -50,7 +50,7 @@ class ApiChatRepository extends ChatRepository {
           Conversation(
             id: c['id'] as String,
             name: c['name'] as String,
-            lastMessage: 'Comunidad',
+            lastMessage: wireStrings.community,
             time: '',
             initials: initialsOf(c['name'] as String),
             color: C.accent,
@@ -102,7 +102,8 @@ class ApiChatRepository extends ChatRepository {
     _activeConversationId = c.id;
     _activeChannelId = null;
     _peerTyping = false;
-    _active = ChatTarget(title: c.name, initials: c.initials, color: c.color, subtitle: 'en línea');
+    _active = ChatTarget(
+        title: c.name, initials: c.initials, color: c.color, subtitle: wireStrings.online);
     _messages = [];
     notifyListeners();
     final r = await _api.send('GET', '/conversations/${c.id}/messages') as Map;
@@ -139,7 +140,7 @@ class ApiChatRepository extends ChatRepository {
       title: '# ${ch.name}',
       initials: '#',
       color: C.accent,
-      subtitle: '${_activeCommunity?.name ?? 'Comunidad'} · canal',
+      subtitle: '${_activeCommunity?.name ?? wireStrings.community} · ${wireStrings.channel}',
     );
     _messages = [];
     notifyListeners();

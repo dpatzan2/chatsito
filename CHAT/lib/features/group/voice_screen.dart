@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../domain/models/channels.dart';
 import '../../domain/repositories/chat_repository.dart';
+import '../../l10n/app_localizations.dart';
 import 'call_controller.dart';
 
 class VoiceScreen extends StatelessWidget {
@@ -36,8 +37,8 @@ class VoiceScreen extends StatelessWidget {
               const SizedBox(height: 14),
               Text(
                 call.connecting
-                    ? 'Conectando…'
-                    : 'Canal de voz · ${community?.name ?? ''}',
+                    ? S.of(context).connecting
+                    : S.of(context).voiceChannelSubtitle(community?.name ?? ''),
                 style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: .55)),
               ),
             ]),

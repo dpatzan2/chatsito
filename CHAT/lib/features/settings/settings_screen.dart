@@ -4,6 +4,7 @@ import '../../app/app_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/avatar.dart';
 import '../../domain/repositories/auth_repository.dart';
+import '../../l10n/app_localizations.dart';
 import 'settings_controller.dart';
 
 class _Item {
@@ -13,18 +14,6 @@ class _Item {
   const _Item(this.key, this.label, this.bg, this.icon, this.fg);
 }
 
-const _group1 = <_Item>[
-  _Item('cuenta', 'Cuenta', Color(0xFFEAF1FE), Icons.person_outline, Color(0xFF2A6FDB)),
-  _Item('privacidad', 'Privacidad', Color(0xFFE7F6F0), Icons.lock_outline, C.green),
-  _Item('chats', 'Chats', Color(0xFFF1EEFF), Icons.chat_bubble_outline, C.accent),
-  _Item('notif', 'Notificaciones', Color(0xFFFDEEE9), Icons.notifications_none, Color(0xFFE76F51)),
-  _Item('storage', 'Almacenamiento y datos', Color(0xFFEAF6FE), Icons.storage_outlined, Color(0xFF1F8AC0)),
-];
-const _group2 = <_Item>[
-  _Item('ayuda', 'Ayuda', Color(0xFFF0F0F4), Icons.help_outline, C.sub),
-  _Item('invitar', 'Invitar a un amigo', Color(0xFFFEF6E7), Icons.person_add_alt, Color(0xFFE0A000)),
-];
-
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
@@ -33,6 +22,18 @@ class SettingsScreen extends StatelessWidget {
     final user = context.watch<AuthRepository>().user;
     final c = context.read<SettingsController>();
     final router = context.read<AppRouter>();
+    final t = S.of(context);
+    final group1 = <_Item>[
+      _Item('cuenta', t.setAccount, const Color(0xFFEAF1FE), Icons.person_outline, const Color(0xFF2A6FDB)),
+      _Item('privacidad', t.setPrivacy, const Color(0xFFE7F6F0), Icons.lock_outline, C.green),
+      _Item('chats', t.setChats, const Color(0xFFF1EEFF), Icons.chat_bubble_outline, C.accent),
+      _Item('notif', t.setNotifications, const Color(0xFFFDEEE9), Icons.notifications_none, const Color(0xFFE76F51)),
+      _Item('storage', t.setStorage, const Color(0xFFEAF6FE), Icons.storage_outlined, const Color(0xFF1F8AC0)),
+    ];
+    final group2 = <_Item>[
+      _Item('ayuda', t.setHelp, const Color(0xFFF0F0F4), Icons.help_outline, C.sub),
+      _Item('invitar', t.setInvite, const Color(0xFFFEF6E7), Icons.person_add_alt, const Color(0xFFE0A000)),
+    ];
 
     return Container(
       color: C.field,
@@ -45,7 +46,7 @@ class SettingsScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(6, 6, 12, 6),
               child: Row(children: [
                 IconButton(onPressed: () => router.go(AppScreen.chats), icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: C.accent)),
-                const Text('Ajustes', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: C.ink)),
+                Text(t.settingsTitle, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: C.ink)),
               ]),
             ),
           ),
@@ -64,18 +65,18 @@ class SettingsScreen extends StatelessWidget {
                       children: [
                         Text(user.displayName, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w800, color: C.ink)),
                         const SizedBox(height: 2),
-                        Text('+34 ${user.phoneFormatted}', style: const TextStyle(fontSize: 13.5, color: C.muted)),
+                        Text('+${user.phoneFormatted}', style: const TextStyle(fontSize: 13.5, color: C.muted)),
                         const SizedBox(height: 5),
-                        const Text('Disponible · ✓ verificado', style: TextStyle(fontSize: 13, color: C.accent, fontWeight: FontWeight.w600)),
+                        Text(t.availableVerified, style: const TextStyle(fontSize: 13, color: C.accent, fontWeight: FontWeight.w600)),
                       ],
                     )),
                     const Icon(Icons.chevron_right, color: C.arrow, size: 22),
                   ]),
                 ),
                 const SizedBox(height: 16),
-                _card(c, _group1),
+                _card(c, group1),
                 const SizedBox(height: 16),
-                _card(c, _group2),
+                _card(c, group2),
                 const SizedBox(height: 22),
                 const Center(child: Text('Chatsito · v1.0.0', style: TextStyle(fontSize: 12, color: Color(0xFFB7BAC4)))),
               ],
