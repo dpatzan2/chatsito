@@ -134,6 +134,16 @@ class SFr extends S {
   String get membersOffline => 'Hors ligne';
 
   @override
+  String get leaveCommunity => 'Quitter la communauté';
+
+  @override
+  String get leaveCommunityConfirm =>
+      'Tu ne verras plus ses salons ni ses messages.';
+
+  @override
+  String get leaveAction => 'Quitter';
+
+  @override
   String get cancel => 'Annuler';
 
   @override

@@ -106,6 +106,12 @@ class InMemoryChatRepository extends ChatRepository {
   }
 
   @override
+  Future<void> leaveCommunity() async {
+    _activeCommunity = null;
+    notifyListeners();
+  }
+
+  @override
   Future<void> createRole(String name, Color? color, BigInt permissions) async {}
 
   @override

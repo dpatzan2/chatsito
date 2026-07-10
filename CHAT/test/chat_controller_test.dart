@@ -52,6 +52,18 @@ void main() {
     expect(router.screen, AppScreen.chats);
   });
 
+  test('openDetails: 1:1 → contactProfile, canal → channelDetail', () async {
+    final router = AppRouter();
+    final ctrl = ChatController(chat, router);
+    ctrl.openConversation(chat.conversations.firstWhere((c) => !c.isGroup));
+    ctrl.openDetails();
+    expect(router.screen, AppScreen.contactProfile);
+    await chat.openCommunity('demo');
+    ctrl.openChannel(chat.activeCommunity!.channels.first);
+    ctrl.openDetails();
+    expect(router.screen, AppScreen.channelDetail);
+  });
+
   test('sendAttachment(doc) posts a document message', () async {
     await c.sendAttachment(MessageType.doc);
     expect(chat.messages.last.type, MessageType.doc);

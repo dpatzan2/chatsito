@@ -134,6 +134,16 @@ class SPt extends S {
   String get membersOffline => 'Offline';
 
   @override
+  String get leaveCommunity => 'Sair da comunidade';
+
+  @override
+  String get leaveCommunityConfirm =>
+      'Você deixará de ver os canais e mensagens.';
+
+  @override
+  String get leaveAction => 'Sair';
+
+  @override
   String get cancel => 'Cancelar';
 
   @override

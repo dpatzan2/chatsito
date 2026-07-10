@@ -341,6 +341,24 @@ abstract class S {
   /// **'Desconectados'**
   String get membersOffline;
 
+  /// No description provided for @leaveCommunity.
+  ///
+  /// In es, this message translates to:
+  /// **'Salir de la comunidad'**
+  String get leaveCommunity;
+
+  /// No description provided for @leaveCommunityConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Dejarás de ver sus canales y mensajes.'**
+  String get leaveCommunityConfirm;
+
+  /// No description provided for @leaveAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Salir'**
+  String get leaveAction;
+
   /// No description provided for @cancel.
   ///
   /// In es, this message translates to:

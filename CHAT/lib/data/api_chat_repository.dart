@@ -103,7 +103,8 @@ class ApiChatRepository extends ChatRepository {
     _activeChannelId = null;
     _peerTyping = false;
     _active = ChatTarget(
-        title: c.name, initials: c.initials, color: c.color, subtitle: wireStrings.online);
+        title: c.name, initials: c.initials, color: c.color, subtitle: wireStrings.online,
+        phone: c.phone);
     _messages = [];
     notifyListeners();
     final r = await _api.send('GET', '/conversations/${c.id}/messages') as Map;
@@ -210,6 +211,15 @@ class ApiChatRepository extends ChatRepository {
     await _api.send('POST', '/communities/${c.id}/channels',
         body: {'name': name, 'type': type});
     await openCommunity(c.id);
+  }
+
+  @override
+  Future<void> leaveCommunity() async {
+    final c = _activeCommunity;
+    if (c == null) return;
+    await _api.send('DELETE', '/communities/${c.id}/members/$_me');
+    _activeCommunity = null;
+    await refresh();
   }
 
   @override

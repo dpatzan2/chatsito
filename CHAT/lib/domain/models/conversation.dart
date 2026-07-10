@@ -5,6 +5,7 @@ class Conversation {
   final Color color;
   final int unread;
   final bool isGroup;
+  final String? phone;
 
   const Conversation({
     required this.id,
@@ -15,6 +16,7 @@ class Conversation {
     required this.color,
     this.unread = 0,
     this.isGroup = false,
+    this.phone,
   });
 
   bool get hasUnread => unread > 0;
@@ -22,6 +24,6 @@ class Conversation {
   Conversation copyWith({String? lastMessage, String? time, int? unread}) => Conversation(
         id: id, name: name, lastMessage: lastMessage ?? this.lastMessage,
         time: time ?? this.time, initials: initials, color: color,
-        unread: unread ?? this.unread, isGroup: isGroup,
+        unread: unread ?? this.unread, isGroup: isGroup, phone: phone,
       );
 }
