@@ -5,8 +5,9 @@ class UserProfile {
   final String id; // uuid del servidor; '' antes de verificar
   final String name;
   final String phone; // raw digits
+  final String? avatarUrl; // absoluta, lista para NetworkImage
 
-  const UserProfile({this.id = '', this.name = '', this.phone = ''});
+  const UserProfile({this.id = '', this.name = '', this.phone = '', this.avatarUrl});
 
   bool get hasName => name.trim().isNotEmpty;
   String get displayName => hasName ? name.trim() : 'Marta García';
@@ -29,6 +30,7 @@ class UserProfile {
     return base.replaceAll(RegExp(r'[^a-z0-9]'), '');
   }
 
-  UserProfile copyWith({String? id, String? name, String? phone}) =>
-      UserProfile(id: id ?? this.id, name: name ?? this.name, phone: phone ?? this.phone);
+  UserProfile copyWith({String? id, String? name, String? phone, String? avatarUrl}) =>
+      UserProfile(id: id ?? this.id, name: name ?? this.name, phone: phone ?? this.phone,
+          avatarUrl: avatarUrl ?? this.avatarUrl);
 }

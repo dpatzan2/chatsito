@@ -144,6 +144,28 @@ class SPt extends S {
   String get leaveAction => 'Sair';
 
   @override
+  String get editProfileTitle => 'Editar perfil';
+
+  @override
+  String get changePhoto => 'Mudar foto';
+
+  @override
+  String get saveAction => 'Salvar';
+
+  @override
+  String get logoutAction => 'Sair da conta';
+
+  @override
+  String get logoutConfirm => 'Sair da conta neste dispositivo?';
+
+  @override
+  String get deleteAccountWarning =>
+      'Sua conta, mensagens e participações serão excluídas. Isso não pode ser desfeito.';
+
+  @override
+  String get deleteAction => 'Excluir';
+
+  @override
   String get cancel => 'Cancelar';
 
   @override

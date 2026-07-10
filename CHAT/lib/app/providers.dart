@@ -56,7 +56,7 @@ class _AppProvidersState extends State<AppProviders> {
         ChangeNotifierProvider(create: (c) => ChatController(c.read<ChatRepository>(), c.read<AppRouter>())),
         ChangeNotifierProvider(create: (c) => GroupController(c.read<ChatRepository>(), c.read<AppRouter>())),
         ChangeNotifierProvider(create: (c) => CallController(c.read<AuthRepository>(), c.read<ChatRepository>(), c.read<AppRouter>())),
-        ChangeNotifierProvider(create: (c) => SettingsController(c.read<SettingsRepository>(), c.read<AppRouter>())),
+        ChangeNotifierProvider(create: (c) => SettingsController(c.read<SettingsRepository>(), c.read<AuthRepository>(), c.read<AppRouter>())),
       ],
       child: widget.child,
     );

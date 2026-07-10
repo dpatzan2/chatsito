@@ -359,6 +359,48 @@ abstract class S {
   /// **'Salir'**
   String get leaveAction;
 
+  /// No description provided for @editProfileTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar perfil'**
+  String get editProfileTitle;
+
+  /// No description provided for @changePhoto.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar foto'**
+  String get changePhoto;
+
+  /// No description provided for @saveAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar'**
+  String get saveAction;
+
+  /// No description provided for @logoutAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Cerrar sesión'**
+  String get logoutAction;
+
+  /// No description provided for @logoutConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Cerrar sesión en este dispositivo?'**
+  String get logoutConfirm;
+
+  /// No description provided for @deleteAccountWarning.
+  ///
+  /// In es, this message translates to:
+  /// **'Se borrarán tu cuenta, tus mensajes y tus membresías. Esto no se puede deshacer.'**
+  String get deleteAccountWarning;
+
+  /// No description provided for @deleteAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Eliminar'**
+  String get deleteAction;
+
   /// No description provided for @cancel.
   ///
   /// In es, this message translates to:
