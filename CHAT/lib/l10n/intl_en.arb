@@ -56,6 +56,7 @@
   "logoutConfirm": "Log out on this device?",
   "deleteAccountWarning": "Your account, messages and memberships will be deleted. This cannot be undone.",
   "deleteAction": "Delete",
+  "uploadError": "Couldn't upload the file",
   "cancel": "Cancel",
   "navChats": "Chats",
   "navGroups": "Groups",

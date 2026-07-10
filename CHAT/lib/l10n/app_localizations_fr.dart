@@ -166,6 +166,9 @@ class SFr extends S {
   String get deleteAction => 'Supprimer';
 
   @override
+  String get uploadError => 'Impossible d\'envoyer le fichier';
+
+  @override
   String get cancel => 'Annuler';
 
   @override

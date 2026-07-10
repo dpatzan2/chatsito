@@ -49,6 +49,9 @@ abstract class ChatRepository extends ChangeNotifier {
   /// Sale de [activeCommunity]. El server emite member.left al resto.
   Future<void> leaveCommunity();
 
+  /// Sube [bytes] y manda un mensaje image/doc con el adjunto al hilo activo.
+  Future<void> sendFile(MessageType type, List<int> bytes, String filename, String mime);
+
   /// Gestión de roles de [activeCommunity]; el server valida permisos.
   Future<void> createRole(String name, Color? color, BigInt permissions);
   Future<void> updateRole(String roleId, {String? name, Color? color, BigInt? permissions});

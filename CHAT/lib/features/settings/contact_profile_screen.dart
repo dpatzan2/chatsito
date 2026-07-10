@@ -76,10 +76,14 @@ class ContactProfileScreen extends StatelessWidget {
                     crossAxisCount: 3, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
                     mainAxisSpacing: 6, crossAxisSpacing: 6,
                     children: [
-                      // ponytail: placeholder gris por imagen; Task 10 lo vuelve Image.network
-                      for (final _ in context.watch<ChatRepository>().messages
+                      for (final m in context.watch<ChatRepository>().messages
                           .where((m) => m.type == MessageType.image))
-                        const DecoratedBox(decoration: BoxDecoration(color: Color(0xFFD9DCE6), borderRadius: BorderRadius.all(Radius.circular(11)))),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(11),
+                          child: m.url == null
+                              ? const ColoredBox(color: Color(0xFFD9DCE6))
+                              : Image.network(m.url!, fit: BoxFit.cover),
+                        ),
                     ],
                   ),
                 ],

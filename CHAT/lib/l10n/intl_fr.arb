@@ -56,6 +56,7 @@
   "logoutConfirm": "Se déconnecter sur cet appareil ?",
   "deleteAccountWarning": "Ton compte, tes messages et tes adhésions seront supprimés. C'est irréversible.",
   "deleteAction": "Supprimer",
+  "uploadError": "Impossible d'envoyer le fichier",
   "cancel": "Annuler",
   "navChats": "Discussions",
   "navGroups": "Groupes",

@@ -72,4 +72,20 @@ void main() {
     expect(c.members[0].online, true);
     expect(c.members[1].online, false);
   });
+
+  test('messageFromWire mapea url de imagen y doc', () {
+    final img = messageFromWire({
+      'id': 'a', 'authorId': 'u1', 'type': 'image',
+      'content': {'url': '/uploads/x.png'},
+      'createdAt': DateTime.now().millisecondsSinceEpoch,
+    }, 'u1', baseUrl: 'http://s');
+    expect(img.url, 'http://s/uploads/x.png');
+    final doc = messageFromWire({
+      'id': 'b', 'authorId': 'u1', 'type': 'doc',
+      'content': {'url': '/uploads/y.pdf', 'name': 'y.pdf', 'size': '10 KB'},
+      'createdAt': DateTime.now().millisecondsSinceEpoch,
+    }, 'u1', baseUrl: 'http://s');
+    expect(doc.url, 'http://s/uploads/y.pdf');
+    expect(doc.docName, 'y.pdf');
+  });
 }

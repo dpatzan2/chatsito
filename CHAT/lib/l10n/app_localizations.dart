@@ -401,6 +401,12 @@ abstract class S {
   /// **'Eliminar'**
   String get deleteAction;
 
+  /// No description provided for @uploadError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo subir el archivo'**
+  String get uploadError;
+
   /// No description provided for @cancel.
   ///
   /// In es, this message translates to:

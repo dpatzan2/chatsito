@@ -166,6 +166,9 @@ class SPt extends S {
   String get deleteAction => 'Excluir';
 
   @override
+  String get uploadError => 'Não foi possível enviar o arquivo';
+
+  @override
   String get cancel => 'Cancelar';
 
   @override

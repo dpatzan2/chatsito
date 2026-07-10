@@ -166,6 +166,9 @@ class SEn extends S {
   String get deleteAction => 'Delete';
 
   @override
+  String get uploadError => 'Couldn\'t upload the file';
+
+  @override
   String get cancel => 'Cancel';
 
   @override

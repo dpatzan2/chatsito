@@ -64,9 +64,9 @@ void main() {
     expect(router.screen, AppScreen.channelDetail);
   });
 
-  test('sendAttachment(doc) posts a document message', () async {
-    await c.sendAttachment(MessageType.doc);
+  test('sendFile(doc) posts a document message', () async {
+    await c.sendFile(MessageType.doc, [1, 2, 3], 'informe.pdf', 'application/pdf');
     expect(chat.messages.last.type, MessageType.doc);
-    expect(chat.messages.last.docName, 'Informe_final.pdf');
+    expect(chat.messages.last.docName, 'informe.pdf');
   });
 }

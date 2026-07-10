@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
@@ -23,7 +24,7 @@ class AttachSheet extends StatelessWidget {
     final options = <_Option>[
       _Option(t.attachCamera, const Color(0xFFF1EEFF), Icons.photo_camera_outlined, C.accent),
       _Option(t.attachGallery, const Color(0xFFE7F6F0), Icons.image_outlined, C.green, MessageType.image),
-      _Option(t.attachVideo, const Color(0xFFFDEEE9), Icons.videocam_outlined, const Color(0xFFE76F51), MessageType.video),
+      _Option(t.attachVideo, const Color(0xFFFDEEE9), Icons.videocam_outlined, const Color(0xFFE76F51)),
       _Option(t.attachDocument, const Color(0xFFEAF1FE), Icons.description_outlined, const Color(0xFF2A6FDB), MessageType.doc),
       _Option(t.attachAudio, const Color(0xFFFBEEF8), Icons.mic_none, const Color(0xFFC13D9E)),
       _Option(t.attachLocation, const Color(0xFFEAF6FE), Icons.location_on_outlined, const Color(0xFF1F8AC0)),
@@ -45,7 +46,7 @@ class AttachSheet extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             mainAxisSpacing: 14, crossAxisSpacing: 8, childAspectRatio: .82,
             children: [for (final o in options) GestureDetector(
-              onTap: () => o.sends != null ? c.sendAttachment(o.sends!) : c.closeSheets(),
+              onTap: () => o.sends != null ? _pick(context, o.sends!) : c.closeSheets(),
               child: Column(mainAxisSize: MainAxisSize.min, children: [
                 Container(
                   width: 56, height: 56,
@@ -61,4 +62,26 @@ class AttachSheet extends StatelessWidget {
       ),
     ]);
   }
+
+  Future<void> _pick(BuildContext context, MessageType type) async {
+    final chat = context.read<ChatController>();
+    final t = S.of(context);
+    final result = await FilePicker.pickFiles(
+        type: type == MessageType.image ? FileType.image : FileType.any, withData: true);
+    final f = result?.files.firstOrNull;
+    if (f == null || f.bytes == null) return;
+    try {
+      await chat.sendFile(type, f.bytes!, f.name, _mimeOf(f));
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t.uploadError)));
+      }
+    }
+  }
+
+  String _mimeOf(PlatformFile f) => switch (f.extension?.toLowerCase()) {
+        'png' => 'image/png', 'gif' => 'image/gif', 'webp' => 'image/webp',
+        'jpg' || 'jpeg' => 'image/jpeg', 'pdf' => 'application/pdf',
+        _ => 'application/octet-stream',
+      };
 }
