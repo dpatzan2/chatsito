@@ -43,7 +43,8 @@ export function communityRoutes(app: FastifyInstance, deps: Deps, hub: Hub): voi
 
   app.get('/communities/:id', async (req) => {
     const { id } = z.object({ id: z.uuid() }).parse(req.params);
-    return getCommunity(deps.db, id, req.userId);
+    const out = await getCommunity(deps.db, id, req.userId);
+    return { ...out, members: out.members.map((m) => ({ ...m, online: hub.isOnline(m.id) })) };
   });
 
   app.patch('/communities/:id', async (req) => {

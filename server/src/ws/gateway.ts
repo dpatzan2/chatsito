@@ -3,6 +3,7 @@ import { ZodError } from 'zod';
 import type { FastifyInstance } from 'fastify';
 import { AppError, type ErrorCode } from '../core/errors.js';
 import { ClientFrame, serverFrame } from './protocol.js';
+import { presencePeers } from './presence.js';
 import { handlers, type HandlerCtx } from './handlers.js';
 import type { Hub } from './hub.js';
 import type { VoiceStates } from '../voice/state.js';
@@ -27,8 +28,19 @@ export async function registerGateway(
       return;
     }
 
+    const notifyPresence = (online: boolean): void => {
+      presencePeers(deps.db, userId)
+        .then((peers) => hub.sendTo(peers, 'presence', { userId, online }))
+        .catch((e) => req.log.error(e));
+    };
+
+    const wasOnline = hub.isOnline(userId);
     hub.add(userId, socket);
-    socket.on('close', () => hub.remove(userId, socket));
+    if (!wasOnline) notifyPresence(true);
+    socket.on('close', () => {
+      hub.remove(userId, socket);
+      if (!hub.isOnline(userId)) notifyPresence(false);
+    });
 
     socket.on('message', async (raw) => {
       let seq: number | undefined;
