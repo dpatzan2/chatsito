@@ -82,3 +82,26 @@ it('GET /users/lookup rate limits per user → RATE_LIMITED 429', async () => {
   }
   expect(last).toBe(429);
 });
+
+it('PATCH /me acepta avatarUrl', async () => {
+  const res = await app.inject({
+    method: 'PATCH', url: '/me', headers: { authorization: `Bearer ${access}` },
+    payload: { avatarUrl: '/uploads/abc.png' },
+  });
+  expect(res.statusCode).toBe(200);
+  expect(res.json().avatarUrl).toBe('/uploads/abc.png');
+});
+
+it('DELETE /me borra la cuenta', async () => {
+  const [u] = await ctx.db.insert(users).values({ phone: '50299999999' }).returning();
+  const tokens = tokenService(ctx.db, 's'.repeat(32));
+  const t = await tokens.signAccess(u.id);
+  const res = await app.inject({
+    method: 'DELETE', url: '/me', headers: { authorization: `Bearer ${t}` },
+  });
+  expect(res.statusCode).toBe(204);
+  const gone = await app.inject({
+    method: 'GET', url: '/me', headers: { authorization: `Bearer ${t}` },
+  });
+  expect(gone.statusCode).toBe(404);
+});

@@ -9,6 +9,7 @@ export const users = pgTable('users', {
   phone: text('phone').notNull().unique(),
   displayName: text('display_name'),
   avatarColor: text('avatar_color'),
+  avatarUrl: text('avatar_url'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 

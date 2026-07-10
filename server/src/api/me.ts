@@ -43,9 +43,17 @@ export function meRoutes(app: FastifyInstance, deps: Deps): void {
     const body = z.object({
       displayName: z.string().min(1).max(50).optional(),
       avatarColor: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+      // solo rutas de nuestro propio /uploads: evita URLs externas o javascript: en el avatar
+      avatarUrl: z.string().regex(/^\/uploads\/[\w.-]+$/).max(300).optional(),
     }).parse(req.body);
     const [u] = await deps.db.update(users).set(body).where(eq(users.id, req.userId)).returning();
     if (!u) throw new AppError('NOT_FOUND', 'User not found');
     return publicUser(u);
+  });
+
+  app.delete('/me', async (req, reply) => {
+    await deps.db.delete(users).where(eq(users.id, req.userId));
+    app.hub.closeAll(req.userId);
+    return reply.status(204).send();
   });
 }
