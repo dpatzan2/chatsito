@@ -94,6 +94,18 @@ class InMemoryChatRepository extends ChatRepository {
   Future<bool> joinInvite(String code) async => false;
 
   @override
+  Future<void> createChannel(String name, String type) async {
+    final c = _activeCommunity;
+    if (c == null) return;
+    _activeCommunity = Community(
+      id: c.id, name: c.name, ownerId: c.ownerId,
+      channels: [...c.channels, Channel(id: 'ch-$name', communityId: c.id, name: name, type: type)],
+      roles: c.roles, members: c.members,
+    );
+    notifyListeners();
+  }
+
+  @override
   Future<void> createRole(String name, Color? color, BigInt permissions) async {}
 
   @override

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/widgets/ask_input.dart';
 import '../../domain/models/community.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/repositories/chat_repository.dart';
@@ -62,9 +63,13 @@ class GroupScreen extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(14, 20, 14, 30),
               children: [
-                _label(t.textChannels),
+                _label(t.textChannels,
+                    onAdd: community != null && community.can(myId, Perm.manageChannels)
+                        ? () => _askNewChannel(context, 'text') : null),
                 for (final ch in community?.textChannels ?? const <Channel>[]) _textChannel(context, chat, ch),
-                _label(t.voiceChannels),
+                _label(t.voiceChannels,
+                    onAdd: community != null && community.can(myId, Perm.manageChannels)
+                        ? () => _askNewChannel(context, 'voice') : null),
                 for (final ch in community?.voiceChannels ?? const <Channel>[]) _voiceChannel(context, call, ch),
               ],
             ),
@@ -83,10 +88,28 @@ class GroupScreen extends StatelessWidget {
         ),
       );
 
-  Widget _label(String t) => Padding(
+  Widget _label(String t, {VoidCallback? onAdd}) => Padding(
         padding: const EdgeInsets.fromLTRB(8, 22, 8, 8),
-        child: Text(t.toUpperCase(), style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: Color(0xFF7E8190), letterSpacing: .6)),
+        child: Row(children: [
+          Expanded(child: Text(t.toUpperCase(), style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: Color(0xFF7E8190), letterSpacing: .6))),
+          if (onAdd != null)
+            GestureDetector(onTap: onAdd, child: const Icon(Icons.add, size: 18, color: Color(0xFF7E8190))),
+        ]),
       );
+
+  void _askNewChannel(BuildContext context, String type) {
+    final t = S.of(context);
+    final repo = context.read<ChatRepository>();
+    askInput(context,
+        title: type == 'voice' ? t.newVoiceChannel : t.newTextChannel,
+        hint: t.channelNameHint,
+        action: t.createChannelAction,
+        keyboard: TextInputType.text,
+        onSubmit: (v) async {
+          try { await repo.createChannel(v, type); return null; }
+          catch (_) { return t.channelCreateError; }
+        });
+  }
 
   Widget _textChannel(BuildContext context, ChatController chat, Channel ch) {
     return GestureDetector(

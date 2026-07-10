@@ -113,6 +113,21 @@ class SEn extends S {
   String get joinError => 'Invalid or expired code';
 
   @override
+  String get newTextChannel => 'New text channel';
+
+  @override
+  String get newVoiceChannel => 'New voice channel';
+
+  @override
+  String get channelNameHint => 'Channel name';
+
+  @override
+  String get createChannelAction => 'Create';
+
+  @override
+  String get channelCreateError => 'Couldn\'t create the channel';
+
+  @override
   String get cancel => 'Cancel';
 
   @override

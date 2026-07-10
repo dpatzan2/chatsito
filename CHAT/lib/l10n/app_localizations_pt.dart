@@ -113,6 +113,21 @@ class SPt extends S {
   String get joinError => 'Código inválido ou expirado';
 
   @override
+  String get newTextChannel => 'Novo canal de texto';
+
+  @override
+  String get newVoiceChannel => 'Novo canal de voz';
+
+  @override
+  String get channelNameHint => 'Nome do canal';
+
+  @override
+  String get createChannelAction => 'Criar';
+
+  @override
+  String get channelCreateError => 'Não foi possível criar o canal';
+
+  @override
   String get cancel => 'Cancelar';
 
   @override

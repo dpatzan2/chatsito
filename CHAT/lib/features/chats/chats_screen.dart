@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../app/app_router.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/widgets/ask_input.dart';
 import '../../core/widgets/avatar.dart';
 import '../../domain/models/conversation.dart';
 import '../../domain/repositories/auth_repository.dart';
@@ -118,7 +119,7 @@ void _openNewMenu(BuildContext context) {
 void _askStartChat(BuildContext context) {
   final chat = context.read<ChatController>();
   final t = S.of(context);
-  _askInput(
+  askInput(
     context,
     title: t.newChat,
     hint: t.newChatHint,
@@ -131,52 +132,13 @@ void _askStartChat(BuildContext context) {
 void _askJoinCode(BuildContext context) {
   final chat = context.read<ChatController>();
   final t = S.of(context);
-  _askInput(
+  askInput(
     context,
     title: t.joinTitle,
     hint: t.joinHint,
     action: t.joinAction,
     keyboard: TextInputType.text,
     onSubmit: (v) async => await chat.joinInvite(v) ? null : t.joinError,
-  );
-}
-
-/// Dialog con un TextField; [onSubmit] devuelve null si fue bien o el error a mostrar.
-void _askInput(BuildContext context,
-    {required String title, required String hint, required String action,
-    required TextInputType keyboard, required Future<String?> Function(String) onSubmit}) {
-  final field = TextEditingController();
-  String? error;
-  bool busy = false;
-  showDialog(
-    context: context,
-    builder: (dialog) => StatefulBuilder(
-      builder: (dialog, setState) => AlertDialog(
-        backgroundColor: Colors.white,
-        title: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: C.ink)),
-        content: TextField(
-          controller: field, autofocus: true, keyboardType: keyboard,
-          decoration: InputDecoration(hintText: hint, errorText: error),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(dialog), child: Text(S.of(context).cancel)),
-          TextButton(
-            onPressed: busy ? null : () async {
-              if (field.text.trim().isEmpty) return;
-              setState(() => busy = true);
-              final err = await onSubmit(field.text.trim());
-              if (!dialog.mounted) return;
-              if (err == null) {
-                Navigator.pop(dialog);
-              } else {
-                setState(() { error = err; busy = false; });
-              }
-            },
-            child: Text(action, style: const TextStyle(fontWeight: FontWeight.w700, color: C.accent)),
-          ),
-        ],
-      ),
-    ),
   );
 }
 

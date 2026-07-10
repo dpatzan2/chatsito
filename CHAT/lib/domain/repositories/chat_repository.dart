@@ -43,6 +43,9 @@ abstract class ChatRepository extends ChangeNotifier {
   Future<String> createInvite();
   Future<bool> joinInvite(String code);
 
+  /// Crea un canal ('text' | 'voice') en [activeCommunity]; el server valida permisos.
+  Future<void> createChannel(String name, String type);
+
   /// Gestión de roles de [activeCommunity]; el server valida permisos.
   Future<void> createRole(String name, Color? color, BigInt permissions);
   Future<void> updateRole(String roleId, {String? name, Color? color, BigInt? permissions});
