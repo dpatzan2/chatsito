@@ -9,6 +9,7 @@ import '../../l10n/app_localizations.dart';
 import '../chat/chat_controller.dart';
 import 'call_controller.dart';
 import 'group_controller.dart';
+import 'members_panel.dart';
 
 class GroupScreen extends StatelessWidget {
   const GroupScreen({super.key});
@@ -20,9 +21,8 @@ class GroupScreen extends StatelessWidget {
     final community = context.watch<ChatRepository>().activeCommunity;
     final myId = context.watch<AuthRepository>().user.id;
     final t = S.of(context);
-    return Container(
-      color: C.ink,
-      child: Column(
+    final wide = MediaQuery.sizeOf(context).width >= 900;
+    final column = Column(
         children: [
           Container(
             padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
@@ -40,6 +40,13 @@ class GroupScreen extends StatelessWidget {
                   const Spacer(),
                   if (community != null && community.can(myId, Perm.manageRoles)) ...[
                     _roundBtn(Icons.shield_outlined, () => context.read<GroupController>().openRoles()),
+                    const SizedBox(width: 10),
+                  ],
+                  if (!wide) ...[
+                    _roundBtn(Icons.people_outline, () => showModalBottomSheet(
+                        context: context,
+                        backgroundColor: const Color(0xFF23252E),
+                        builder: (_) => const SizedBox(height: 480, child: MembersPanel()))),
                     const SizedBox(width: 10),
                   ],
                   _roundBtn(Icons.person_add_alt_1, () => context.read<GroupController>().openInvite()),
@@ -75,7 +82,15 @@ class GroupScreen extends StatelessWidget {
             ),
           ),
         ],
-      ),
+      );
+    return Container(
+      color: C.ink,
+      child: wide
+          ? Row(children: [
+              Expanded(child: column),
+              const SizedBox(width: 280, child: MembersPanel()),
+            ])
+          : column,
     );
   }
 

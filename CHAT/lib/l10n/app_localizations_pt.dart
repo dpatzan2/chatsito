@@ -128,6 +128,12 @@ class SPt extends S {
   String get channelCreateError => 'Não foi possível criar o canal';
 
   @override
+  String get membersOnline => 'Online';
+
+  @override
+  String get membersOffline => 'Offline';
+
+  @override
   String get cancel => 'Cancelar';
 
   @override

@@ -44,6 +44,8 @@
   "channelNameHint": "Nom du salon",
   "createChannelAction": "Créer",
   "channelCreateError": "Impossible de créer le salon",
+  "membersOnline": "En ligne",
+  "membersOffline": "Hors ligne",
   "cancel": "Annuler",
   "navChats": "Discussions",
   "navGroups": "Groupes",

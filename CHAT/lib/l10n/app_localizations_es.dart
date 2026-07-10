@@ -128,6 +128,12 @@ class SEs extends S {
   String get channelCreateError => 'No se pudo crear el canal';
 
   @override
+  String get membersOnline => 'En línea';
+
+  @override
+  String get membersOffline => 'Desconectados';
+
+  @override
   String get cancel => 'Cancelar';
 
   @override

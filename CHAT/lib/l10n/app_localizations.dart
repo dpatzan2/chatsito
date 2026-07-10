@@ -329,6 +329,18 @@ abstract class S {
   /// **'No se pudo crear el canal'**
   String get channelCreateError;
 
+  /// No description provided for @membersOnline.
+  ///
+  /// In es, this message translates to:
+  /// **'En línea'**
+  String get membersOnline;
+
+  /// No description provided for @membersOffline.
+  ///
+  /// In es, this message translates to:
+  /// **'Desconectados'**
+  String get membersOffline;
+
   /// No description provided for @cancel.
   ///
   /// In es, this message translates to:
