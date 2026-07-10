@@ -55,7 +55,14 @@ export function buildApp(deps: Deps): FastifyInstance {
 
   const uploadsDir = resolve(deps.uploadsDir ?? 'uploads');
   mkdirSync(uploadsDir, { recursive: true });
-  app.register(fastifyStatic, { root: uploadsDir, prefix: '/uploads/' });
+  app.register(fastifyStatic, {
+    root: uploadsDir, prefix: '/uploads/',
+    setHeaders(res) {
+      // contenido subido por usuarios: nunca ejecutarlo en el origen de la app (XSS almacenado)
+      res.setHeader('content-security-policy', "default-src 'none'");
+      res.setHeader('x-content-type-options', 'nosniff');
+    },
+  });
 
   const hub = new Hub();
   app.decorate('hub', hub);

@@ -11,6 +11,10 @@ export class Hub {
     set.add(ws);
   }
 
+  isOnline(userId: string): boolean {
+    return this.sockets.has(userId);
+  }
+
   remove(userId: string, ws: WebSocket): void {
     const set = this.sockets.get(userId);
     set?.delete(ws);

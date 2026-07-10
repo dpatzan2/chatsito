@@ -8,6 +8,9 @@ export function wsClient(url: string, token?: string) {
   const waiters: Array<(f: WsFrame) => void> = [];
   ws.on('message', (raw) => {
     const frame = JSON.parse(String(raw)) as WsFrame;
+    // presence llega en cualquier momento al (des)conectar clientes; los tests
+    // de ops la ignoran para no depender del orden (cobertura en presence.test.ts)
+    if (frame.op === 'presence') return;
     const w = waiters.shift();
     if (w) w(frame); else queue.push(frame);
   });
