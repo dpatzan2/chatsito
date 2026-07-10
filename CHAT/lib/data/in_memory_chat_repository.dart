@@ -73,6 +73,7 @@ class InMemoryChatRepository extends ChatRepository {
       initials: '#',
       color: C.accent,
       subtitle: '${_activeCommunity?.name ?? 'Equipo Producto'} · canal',
+      isChannel: true,
     );
     notifyListeners();
   }

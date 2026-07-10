@@ -141,6 +141,7 @@ class ApiChatRepository extends ChatRepository {
       initials: '#',
       color: C.accent,
       subtitle: '${_activeCommunity?.name ?? wireStrings.community} · ${wireStrings.channel}',
+      isChannel: true,
     );
     _messages = [];
     notifyListeners();

@@ -35,6 +35,23 @@ void main() {
     expect(router.screen, AppScreen.group);
   });
 
+  test('back desde un canal vuelve a la comunidad, no a chats', () async {
+    final router = AppRouter();
+    final ctrl = ChatController(chat, router);
+    await chat.openCommunity('demo');
+    ctrl.openChannel(chat.activeCommunity!.channels.first);
+    ctrl.backToChats();
+    expect(router.screen, AppScreen.group);
+  });
+
+  test('back desde un 1:1 vuelve a chats', () async {
+    final router = AppRouter();
+    final ctrl = ChatController(chat, router);
+    ctrl.openConversation(chat.conversations.firstWhere((c) => !c.isGroup));
+    ctrl.backToChats();
+    expect(router.screen, AppScreen.chats);
+  });
+
   test('sendAttachment(doc) posts a document message', () async {
     await c.sendAttachment(MessageType.doc);
     expect(chat.messages.last.type, MessageType.doc);

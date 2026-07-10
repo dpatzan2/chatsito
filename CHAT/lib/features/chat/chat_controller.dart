@@ -56,7 +56,8 @@ class ChatController extends ChangeNotifier {
   }
 
   void openContactProfile() => _router.go(AppScreen.contactProfile);
-  void backToChats() => _router.go(AppScreen.chats);
+  void backToChats() =>
+      _router.go(target?.isChannel == true ? AppScreen.group : AppScreen.chats);
   void backToChat() => _router.go(AppScreen.chat);
 
   void setDraft(String v) {
