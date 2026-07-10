@@ -1,6 +1,10 @@
+import { mkdirSync } from 'node:fs';
+import { resolve } from 'node:path';
 import Fastify, { type FastifyInstance } from 'fastify';
+import fastifyStatic from '@fastify/static';
 import { ZodError } from 'zod';
 import { AppError } from './core/errors.js';
+import { uploadRoutes } from './api/uploads.js';
 import { authRoutes } from './api/auth.js';
 import { meRoutes } from './api/me.js';
 import { conversationRoutes } from './api/conversations.js';
@@ -27,6 +31,7 @@ export interface Deps {
   tokens: Tokens;
   lk?: LiveKitCfg;   // default: DEV_LIVEKIT (modo --dev del compose)
   lkApi?: RoomApi;   // inyectable en tests
+  uploadsDir?: string; // default: ./uploads
 }
 
 export function buildApp(deps: Deps): FastifyInstance {
@@ -48,6 +53,10 @@ export function buildApp(deps: Deps): FastifyInstance {
     reply.status(404).send({ error: { code: 'NOT_FOUND', message: 'Route not found' } }),
   );
 
+  const uploadsDir = resolve(deps.uploadsDir ?? 'uploads');
+  mkdirSync(uploadsDir, { recursive: true });
+  app.register(fastifyStatic, { root: uploadsDir, prefix: '/uploads/' });
+
   const hub = new Hub();
   app.decorate('hub', hub);
   const voice = new VoiceStates();
@@ -56,6 +65,7 @@ export function buildApp(deps: Deps): FastifyInstance {
   authRoutes(app, deps);
   app.register(async (scope) => {
     scope.addHook('onRequest', authGuard(deps.tokens));
+    await uploadRoutes(scope, uploadsDir);
     meRoutes(scope, deps);
     conversationRoutes(scope, deps);
     communityRoutes(scope, deps, hub);
