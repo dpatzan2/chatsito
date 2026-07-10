@@ -21,6 +21,10 @@ export class Hub {
     if (set?.size === 0) this.sockets.delete(userId);
   }
 
+  closeAll(userId: string): void {
+    for (const ws of this.sockets.get(userId) ?? []) ws.close(4000, 'account deleted');
+  }
+
   sendTo(userIds: string[], op: string, d: unknown): void {
     const frame = serverFrame(op, d);
     for (const id of new Set(userIds)) {

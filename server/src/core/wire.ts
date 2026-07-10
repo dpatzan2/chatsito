@@ -5,6 +5,7 @@ export const publicUser = (u: typeof users.$inferSelect) => ({
   phone: u.phone,
   displayName: u.displayName,
   avatarColor: u.avatarColor,
+  avatarUrl: u.avatarUrl,
 });
 
 export const wireMessage = (m: typeof messages.$inferSelect) => ({
