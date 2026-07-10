@@ -29,6 +29,15 @@ Future<(int, String)> _ioHttp(
   }
 }
 
+/// Cuerpo multipart/form-data con un único campo `file`.
+List<int> buildMultipart(String boundary, String filename, String mime, List<int> bytes) {
+  final head = utf8.encode('--$boundary\r\n'
+      'Content-Disposition: form-data; name="file"; filename="$filename"\r\n'
+      'Content-Type: $mime\r\n\r\n');
+  final tail = utf8.encode('\r\n--$boundary--\r\n');
+  return [...head, ...bytes, ...tail];
+}
+
 /// Cliente JSON con tokens. Reintenta una vez tras refrescar si el access caducó.
 /// La persistencia la hace quien escuche [onTokens] (este archivo sigue sin Flutter
 /// para que el smoke lo corra con `dart run`).
@@ -74,6 +83,37 @@ class ApiClient {
       if (body != null) 'content-type': 'application/json',
       if (access != null) 'authorization': 'Bearer $access',
     }, body == null ? null : jsonEncode(body));
+  }
+
+  /// Sube un archivo a POST /uploads. Reintenta una vez tras refresh si expiró.
+  Future<Map<String, dynamic>> upload(List<int> bytes, String filename, String mime) async {
+    var (status, text) = await _rawUpload(bytes, filename, mime);
+    if (status == 401 && refresh != null) {
+      await _refresh();
+      (status, text) = await _rawUpload(bytes, filename, mime);
+    }
+    final json = text.isEmpty ? null : jsonDecode(text);
+    if (status >= 400) {
+      final err = (json is Map ? json['error'] : null) as Map?;
+      throw ApiException(status, (err?['code'] as String?) ?? 'INTERNAL',
+          (err?['message'] as String?) ?? text);
+    }
+    return (json as Map).cast<String, dynamic>();
+  }
+
+  Future<(int, String)> _rawUpload(List<int> bytes, String filename, String mime) async {
+    final boundary = 'chatsito${DateTime.now().microsecondsSinceEpoch}';
+    final client = HttpClient();
+    try {
+      final req = await client.postUrl(Uri.parse('$baseUrl/uploads'));
+      req.headers.set('content-type', 'multipart/form-data; boundary=$boundary');
+      if (access != null) req.headers.set('authorization', 'Bearer $access');
+      req.add(buildMultipart(boundary, filename, mime, bytes));
+      final res = await req.close();
+      return (res.statusCode, await res.transform(utf8.decoder).join());
+    } finally {
+      client.close();
+    }
   }
 
   Future<void> _refresh() async {
