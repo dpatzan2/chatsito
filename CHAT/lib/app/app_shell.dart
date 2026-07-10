@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../core/theme/app_colors.dart';
 import '../features/chat/chat_screen.dart';
 import '../features/chats/chats_screen.dart';
+import '../features/group/channel_detail_screen.dart';
 import '../features/group/create_group_screen.dart';
 import '../features/group/group_screen.dart';
 import '../features/group/role_edit_screen.dart';
@@ -70,5 +71,6 @@ class AppShell extends StatelessWidget {
         AppScreen.detail => const DetailScreen(),
         AppScreen.invite => const InviteScreen(),
         AppScreen.contactProfile => const ContactProfileScreen(),
+        AppScreen.channelDetail => const ChannelDetailScreen(),
       };
 }

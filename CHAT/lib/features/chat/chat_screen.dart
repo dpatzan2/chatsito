@@ -100,7 +100,7 @@ class _Header extends StatelessWidget {
             IconButton(onPressed: c.backToChats, icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: C.accent)),
             Expanded(
               child: GestureDetector(
-                onTap: c.openContactProfile,
+                onTap: c.openDetails,
                 child: Row(children: [
                   Container(
                     width: 40, height: 40, alignment: Alignment.center,

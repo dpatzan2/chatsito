@@ -5,11 +5,13 @@ class ChatTarget {
   final String title, initials, subtitle;
   final Color color;
   final bool isChannel;
+  final String? phone;
   const ChatTarget({
     required this.title,
     required this.initials,
     required this.subtitle,
     required this.color,
     this.isChannel = false,
+    this.phone,
   });
 }

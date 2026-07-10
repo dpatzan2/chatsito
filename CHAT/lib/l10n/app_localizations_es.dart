@@ -134,6 +134,15 @@ class SEs extends S {
   String get membersOffline => 'Desconectados';
 
   @override
+  String get leaveCommunity => 'Salir de la comunidad';
+
+  @override
+  String get leaveCommunityConfirm => 'Dejarás de ver sus canales y mensajes.';
+
+  @override
+  String get leaveAction => 'Salir';
+
+  @override
   String get cancel => 'Cancelar';
 
   @override

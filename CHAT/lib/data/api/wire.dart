@@ -142,6 +142,7 @@ Conversation conversationFromWire(Map<String, dynamic> c, String myUserId) {
     initials: initialsOf(name),
     color: colorFromHex((other['avatarColor'] as String?) ?? '#7C5CFF'),
     unread: (c['unread'] as int?) ?? 0,
+    phone: other['phone'] as String?,
   );
 }
 

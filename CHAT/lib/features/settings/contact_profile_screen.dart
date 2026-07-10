@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/utils/formatters.dart';
 import '../../core/widgets/app_toggle.dart';
 import '../../core/widgets/avatar.dart';
 import '../../domain/models/chat_target.dart';
+import '../../domain/models/message.dart';
+import '../../domain/repositories/chat_repository.dart';
 import '../../l10n/app_localizations.dart';
 import '../chat/chat_controller.dart';
 import 'settings_controller.dart';
@@ -35,7 +38,8 @@ class ContactProfileScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   Text(t.title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: C.ink, letterSpacing: -.3)),
                   const SizedBox(height: 5),
-                  const Text('+34 555 555 555', style: TextStyle(fontSize: 15, color: C.sub)),
+                  Text(t.phone == null ? '' : '+${formatPhone(t.phone!)}',
+                      style: const TextStyle(fontSize: 15, color: C.sub)),
                   const SizedBox(height: 8),
                   Text(t.subtitle, style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: C.green)),
                 ]),
@@ -71,27 +75,39 @@ class ContactProfileScreen extends StatelessWidget {
                   GridView.count(
                     crossAxisCount: 3, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
                     mainAxisSpacing: 6, crossAxisSpacing: 6,
-                    children: const [Color(0xFFD9DCE6), Color(0xFFE7E2F5), Color(0xFFE0ECEA), Color(0xFFF1E4DC), Color(0xFFDDE6F0), Color(0xFFEAE2EC)]
-                        .map((col) => DecoratedBox(decoration: BoxDecoration(color: col, borderRadius: BorderRadius.all(Radius.circular(11))))).toList(),
+                    children: [
+                      // ponytail: placeholder gris por imagen; Task 10 lo vuelve Image.network
+                      for (final _ in context.watch<ChatRepository>().messages
+                          .where((m) => m.type == MessageType.image))
+                        const DecoratedBox(decoration: BoxDecoration(color: Color(0xFFD9DCE6), borderRadius: BorderRadius.all(Radius.circular(11)))),
+                    ],
                   ),
                 ],
               )),
               _section(margin: const EdgeInsets.fromLTRB(16, 16, 16, 0), padding: EdgeInsets.zero, child: Column(children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: C.hair))),
-                  child: Row(children: [
-                    Expanded(child: Text(s.muteNotifications, style: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.w500, color: C.ink))),
-                    AppToggle(settings.isOn('contactMute'), () => settings.toggle('contactMute')),
-                  ]),
+                // ponytail: silenciar es visual (deshabilitado); funcional en otra fase
+                Opacity(
+                  opacity: .4,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: C.hair))),
+                    child: Row(children: [
+                      Expanded(child: Text(s.muteNotifications, style: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.w500, color: C.ink))),
+                      AppToggle(settings.isOn('contactMute'), () {}),
+                    ]),
+                  ),
                 ),
                 _navRow(s.tempMessages, s.disabled),
                 _navRow(s.encryption, s.verified, last: true),
               ])),
-              _section(margin: const EdgeInsets.fromLTRB(16, 16, 16, 0), padding: EdgeInsets.zero, child: Column(children: [
-                _dangerRow(Icons.block, s.blockContact(t.title)),
-                _dangerRow(Icons.flag_outlined, s.reportContact, last: true),
-              ])),
+              // ponytail: bloquear/reportar visual (deshabilitado); funcional en otra fase
+              Opacity(
+                opacity: .4,
+                child: _section(margin: const EdgeInsets.fromLTRB(16, 16, 16, 0), padding: EdgeInsets.zero, child: Column(children: [
+                  _dangerRow(Icons.block, s.blockContact(t.title)),
+                  _dangerRow(Icons.flag_outlined, s.reportContact, last: true),
+                ])),
+              ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(28, 20, 28, 0),
                 child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [

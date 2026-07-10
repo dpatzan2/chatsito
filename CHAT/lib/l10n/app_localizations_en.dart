@@ -134,6 +134,16 @@ class SEn extends S {
   String get membersOffline => 'Offline';
 
   @override
+  String get leaveCommunity => 'Leave community';
+
+  @override
+  String get leaveCommunityConfirm =>
+      'You\'ll stop seeing its channels and messages.';
+
+  @override
+  String get leaveAction => 'Leave';
+
+  @override
   String get cancel => 'Cancel';
 
   @override
