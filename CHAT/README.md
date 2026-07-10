@@ -34,6 +34,18 @@ solo se vuelve a pedir el código si el refresh token caduca.
   lista los roles; se crean/editan con color, permisos y miembros.
 - **Voz**: tocar un canal de voz conecta al SFU de LiveKit (mic real);
   el mute propio apaga el micrófono, la ocupación llega por `voice.state`.
+- **Media**: 📎 → *Galería* o *Documento* sube el archivo al server (límite
+  25 MB) y lo manda al hilo; las imágenes se ven inline con visor a pantalla
+  completa y los docs se abren al tocarlos.
+- **Miembros**: botón 👥 del grupo (o columna fija en ventanas anchas) muestra
+  los miembros agrupados por rol con presencia online/offline en vivo.
+- **Detalles del chat**: tocar el header abre el perfil del contacto (1:1,
+  teléfono y media reales) o el detalle del canal (miembros, invitar, salir
+  de la comunidad).
+- **Ajustes**: editar nombre y foto de perfil, cerrar sesión y eliminar la
+  cuenta; el resto de secciones sigue siendo visual.
+- **Crear canales**: botón + junto a los títulos de canales del grupo
+  (visible con permiso *Gestionar canales*), texto o voz.
 
 ## Smoke end-to-end
 

@@ -54,5 +54,17 @@ Voz: el cliente conecta al SFU con el token de `voice.ready`
 LiveKit (`POST /livekit/webhook`). Sin `VOICE_SPEAK` el token es
 solo-escucha; *speaking* lo da el SDK de LiveKit directamente.
 
-Tipos de mensaje y su `content`: `text {text}`, `doc {name, size}`, `sticker {sticker}`,
-`image {}`, `video {}` (media real fuera de alcance por ahora).
+Tipos de mensaje y su `content`: `text {text}`, `doc {name, size, url?, mime?}`,
+`sticker {sticker}`, `image {url?, mime?}`, `video {}` (video real fuera de alcance).
+
+## Uploads y presencia
+
+- `POST /uploads` (multipart, campo `file`, máx. 25 MB) guarda en disco local
+  (`uploads/`, configurable con `UPLOADS_DIR`) y devuelve `{url, name, size,
+  mime}`; se sirven en `GET /uploads/<archivo>` con CSP `default-src 'none'`
+  (nunca se ejecuta contenido subido por usuarios).
+- `PATCH /me` acepta `avatarUrl` (solo rutas `/uploads/...`); `DELETE /me`
+  borra la cuenta y cierra sus sockets.
+- Presencia: al conectar/desconectar el último socket de un usuario, sus
+  contactos 1:1 y co-miembros de comunidad reciben `presence {userId, online}`;
+  `GET /communities/:id` incluye `online` por miembro.
