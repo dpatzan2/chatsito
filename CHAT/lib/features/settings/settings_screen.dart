@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../app/app_router.dart';
@@ -54,11 +55,14 @@ class SettingsScreen extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 30),
               children: [
-                Container(
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => _editProfile(context),
+                  child: Container(
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
                   child: Row(children: [
-                    Avatar(user.initials, C.accent, size: 64, fontSize: 22),
+                    Avatar(user.initials, C.accent, size: 64, fontSize: 22, imageUrl: user.avatarUrl),
                     const SizedBox(width: 15),
                     Expanded(child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,15 +76,118 @@ class SettingsScreen extends StatelessWidget {
                     )),
                     const Icon(Icons.chevron_right, color: C.arrow, size: 22),
                   ]),
+                  ),
                 ),
                 const SizedBox(height: 16),
                 _card(c, group1),
                 const SizedBox(height: 16),
                 _card(c, group2),
+                const SizedBox(height: 16),
+                _sessionCard(context, c, t),
                 const SizedBox(height: 22),
                 const Center(child: Text('Chatsito · v1.0.0', style: TextStyle(fontSize: 12, color: Color(0xFFB7BAC4)))),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _editProfile(BuildContext context) {
+    final t = S.of(context);
+    final auth = context.read<AuthRepository>();
+    final name = TextEditingController(text: auth.user.name);
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
+      builder: (sheet) => Padding(
+        padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + MediaQuery.viewInsetsOf(sheet).bottom),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Text(t.editProfileTitle, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: C.ink)),
+          const SizedBox(height: 18),
+          ListenableBuilder(
+            listenable: auth,
+            builder: (_, _) => Avatar(auth.user.initials, C.accent,
+                size: 88, fontSize: 30, imageUrl: auth.user.avatarUrl),
+          ),
+          TextButton(
+            onPressed: () async {
+              final r = await FilePicker.pickFiles(type: FileType.image, withData: true);
+              final f = r?.files.firstOrNull;
+              if (f?.bytes == null) return;
+              await auth.saveAvatar(f!.bytes!, f.name, 'image/${f.extension ?? 'jpeg'}');
+            },
+            child: Text(t.changePhoto, style: const TextStyle(fontWeight: FontWeight.w700, color: C.accent)),
+          ),
+          TextField(
+            controller: name,
+            decoration: InputDecoration(hintText: t.profileNameHint),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              style: FilledButton.styleFrom(backgroundColor: C.accent),
+              onPressed: () async {
+                if (name.text.trim().isNotEmpty) await auth.saveName(name.text.trim());
+                if (sheet.mounted) Navigator.pop(sheet);
+              },
+              child: Text(t.saveAction),
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  Widget _sessionCard(BuildContext context, SettingsController c, S t) => Container(
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+        clipBehavior: Clip.antiAlias,
+        child: Column(children: [
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => _confirm(context, t.logoutAction, t.logoutConfirm, t.logoutAction, C.accent, c.logout),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: C.hair))),
+              child: Row(children: [
+                const Icon(Icons.logout, size: 20, color: C.accent),
+                const SizedBox(width: 11),
+                Text(t.logoutAction, style: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.w600, color: C.accent)),
+              ]),
+            ),
+          ),
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => _confirm(context, t.catDeleteAccount, t.deleteAccountWarning, t.deleteAction, C.danger, c.deleteAccount),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: Row(children: [
+                const Icon(Icons.delete_outline, size: 20, color: C.danger),
+                const SizedBox(width: 11),
+                Text(t.catDeleteAccount, style: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.w600, color: C.danger)),
+              ]),
+            ),
+          ),
+        ]),
+      );
+
+  void _confirm(BuildContext context, String title, String message, String action,
+      Color color, Future<void> Function() onConfirm) {
+    showDialog(
+      context: context,
+      builder: (dialog) => AlertDialog(
+        backgroundColor: Colors.white,
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialog), child: Text(S.of(context).cancel)),
+          TextButton(
+            onPressed: () { Navigator.pop(dialog); onConfirm(); },
+            child: Text(action, style: TextStyle(fontWeight: FontWeight.w700, color: color)),
           ),
         ],
       ),

@@ -19,4 +19,13 @@ abstract class AuthRepository extends ChangeNotifier {
 
   /// Persist the user's display name.
   Future<void> saveName(String name);
+
+  /// Sube la foto de perfil y la persiste en el backend.
+  Future<void> saveAvatar(List<int> bytes, String filename, String mime) async {}
+
+  /// Cierra la sesión en el servidor y limpia el estado local.
+  Future<void> logout() async {}
+
+  /// Borra la cuenta en el servidor y limpia el estado local.
+  Future<void> deleteAccount() async {}
 }

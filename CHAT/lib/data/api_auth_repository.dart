@@ -34,11 +34,7 @@ class ApiAuthRepository extends AuthRepository {
     _api.refresh = refresh;
     try {
       final u = (await _api.send('GET', '/me') as Map).cast<String, dynamic>();
-      _user = UserProfile(
-        id: u['id'] as String,
-        name: (u['displayName'] as String?) ?? '',
-        phone: u['phone'] as String,
-      );
+      _user = _profileFromWire(u);
       notifyListeners();
       return true;
     } catch (_) {
@@ -61,11 +57,7 @@ class ApiAuthRepository extends AuthRepository {
           body: {'phone': _user.phone, 'code': code}) as Map;
       _api.setTokens(r['access'] as String, r['refresh'] as String);
       final u = (r['user'] as Map).cast<String, dynamic>();
-      _user = UserProfile(
-        id: u['id'] as String,
-        name: (u['displayName'] as String?) ?? '',
-        phone: u['phone'] as String,
-      );
+      _user = _profileFromWire(u);
       notifyListeners();
       return true;
     } on ApiException {
@@ -79,4 +71,41 @@ class ApiAuthRepository extends AuthRepository {
     _user = _user.copyWith(name: name);
     notifyListeners();
   }
+
+  @override
+  Future<void> saveAvatar(List<int> bytes, String filename, String mime) async {
+    final up = await _api.upload(bytes, filename, mime);
+    await _api.send('PATCH', '/me', body: {'avatarUrl': up['url']});
+    _user = _user.copyWith(avatarUrl: '${_api.baseUrl}${up['url']}');
+    notifyListeners();
+  }
+
+  @override
+  Future<void> logout() async {
+    try {
+      await _api.send('POST', '/auth/logout', body: {'refresh': _api.refresh});
+    } catch (_) {
+      // best-effort: lo local se limpia igual
+    }
+    _clearSession();
+  }
+
+  @override
+  Future<void> deleteAccount() async {
+    await _api.send('DELETE', '/me');
+    _clearSession();
+  }
+
+  void _clearSession() {
+    _api.setTokens(null, null);
+    _user = const UserProfile();
+    notifyListeners();
+  }
+
+  UserProfile _profileFromWire(Map<String, dynamic> u) => UserProfile(
+        id: u['id'] as String,
+        name: (u['displayName'] as String?) ?? '',
+        phone: u['phone'] as String,
+        avatarUrl: u['avatarUrl'] == null ? null : '${_api.baseUrl}${u['avatarUrl']}',
+      );
 }

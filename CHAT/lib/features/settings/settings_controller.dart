@@ -1,11 +1,16 @@
 import 'package:flutter/foundation.dart';
 import '../../app/app_router.dart';
+import '../../domain/repositories/auth_repository.dart';
 import '../../domain/repositories/settings_repository.dart';
 
 class SettingsController extends ChangeNotifier {
   final SettingsRepository _settings;
+  final AuthRepository _auth;
   final AppRouter _router;
-  SettingsController(this._settings, this._router);
+  SettingsController(this._settings, this._auth, this._router);
+
+  Future<void> logout() async { await _auth.logout(); _router.go(AppScreen.welcome); }
+  Future<void> deleteAccount() async { await _auth.deleteAccount(); _router.go(AppScreen.welcome); }
 
   String detailKey = 'cuenta';
 

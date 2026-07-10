@@ -21,4 +21,10 @@ void main() {
     const u = UserProfile(phone: '612345678');
     expect(u.phoneFormatted, '612 345 678');
   });
+
+  test('copyWith conserva y cambia avatarUrl', () {
+    const u = UserProfile(id: '1', name: 'Ana', phone: '502', avatarUrl: '/a.png');
+    expect(u.copyWith(name: 'B').avatarUrl, '/a.png');
+    expect(u.copyWith(avatarUrl: '/b.png').avatarUrl, '/b.png');
+  });
 }

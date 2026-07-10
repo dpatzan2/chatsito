@@ -144,6 +144,28 @@ class SFr extends S {
   String get leaveAction => 'Quitter';
 
   @override
+  String get editProfileTitle => 'Modifier le profil';
+
+  @override
+  String get changePhoto => 'Changer la photo';
+
+  @override
+  String get saveAction => 'Enregistrer';
+
+  @override
+  String get logoutAction => 'Se déconnecter';
+
+  @override
+  String get logoutConfirm => 'Se déconnecter sur cet appareil ?';
+
+  @override
+  String get deleteAccountWarning =>
+      'Ton compte, tes messages et tes adhésions seront supprimés. C\'est irréversible.';
+
+  @override
+  String get deleteAction => 'Supprimer';
+
+  @override
   String get cancel => 'Annuler';
 
   @override

@@ -144,6 +144,28 @@ class SEn extends S {
   String get leaveAction => 'Leave';
 
   @override
+  String get editProfileTitle => 'Edit profile';
+
+  @override
+  String get changePhoto => 'Change photo';
+
+  @override
+  String get saveAction => 'Save';
+
+  @override
+  String get logoutAction => 'Log out';
+
+  @override
+  String get logoutConfirm => 'Log out on this device?';
+
+  @override
+  String get deleteAccountWarning =>
+      'Your account, messages and memberships will be deleted. This cannot be undone.';
+
+  @override
+  String get deleteAction => 'Delete';
+
+  @override
   String get cancel => 'Cancel';
 
   @override

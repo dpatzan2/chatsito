@@ -143,6 +143,28 @@ class SEs extends S {
   String get leaveAction => 'Salir';
 
   @override
+  String get editProfileTitle => 'Editar perfil';
+
+  @override
+  String get changePhoto => 'Cambiar foto';
+
+  @override
+  String get saveAction => 'Guardar';
+
+  @override
+  String get logoutAction => 'Cerrar sesión';
+
+  @override
+  String get logoutConfirm => '¿Cerrar sesión en este dispositivo?';
+
+  @override
+  String get deleteAccountWarning =>
+      'Se borrarán tu cuenta, tus mensajes y tus membresías. Esto no se puede deshacer.';
+
+  @override
+  String get deleteAction => 'Eliminar';
+
+  @override
   String get cancel => 'Cancelar';
 
   @override
