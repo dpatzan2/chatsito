@@ -113,6 +113,21 @@ class SFr extends S {
   String get joinError => 'Code invalide ou expiré';
 
   @override
+  String get newTextChannel => 'Nouveau salon textuel';
+
+  @override
+  String get newVoiceChannel => 'Nouveau salon vocal';
+
+  @override
+  String get channelNameHint => 'Nom du salon';
+
+  @override
+  String get createChannelAction => 'Créer';
+
+  @override
+  String get channelCreateError => 'Impossible de créer le salon';
+
+  @override
   String get cancel => 'Annuler';
 
   @override

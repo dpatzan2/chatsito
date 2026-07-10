@@ -204,6 +204,15 @@ class ApiChatRepository extends ChatRepository {
   }
 
   @override
+  Future<void> createChannel(String name, String type) async {
+    final c = _activeCommunity;
+    if (c == null) return;
+    await _api.send('POST', '/communities/${c.id}/channels',
+        body: {'name': name, 'type': type});
+    await openCommunity(c.id);
+  }
+
+  @override
   Future<void> createRole(String name, Color? color, BigInt permissions) async {
     final c = _activeCommunity;
     if (c == null) return;

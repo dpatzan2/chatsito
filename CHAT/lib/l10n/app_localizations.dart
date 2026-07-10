@@ -299,6 +299,36 @@ abstract class S {
   /// **'Código inválido o caducado'**
   String get joinError;
 
+  /// No description provided for @newTextChannel.
+  ///
+  /// In es, this message translates to:
+  /// **'Nuevo canal de texto'**
+  String get newTextChannel;
+
+  /// No description provided for @newVoiceChannel.
+  ///
+  /// In es, this message translates to:
+  /// **'Nuevo canal de voz'**
+  String get newVoiceChannel;
+
+  /// No description provided for @channelNameHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre del canal'**
+  String get channelNameHint;
+
+  /// No description provided for @createChannelAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear'**
+  String get createChannelAction;
+
+  /// No description provided for @channelCreateError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo crear el canal'**
+  String get channelCreateError;
+
   /// No description provided for @cancel.
   ///
   /// In es, this message translates to:

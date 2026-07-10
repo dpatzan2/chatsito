@@ -113,6 +113,21 @@ class SEs extends S {
   String get joinError => 'Código inválido o caducado';
 
   @override
+  String get newTextChannel => 'Nuevo canal de texto';
+
+  @override
+  String get newVoiceChannel => 'Nuevo canal de voz';
+
+  @override
+  String get channelNameHint => 'Nombre del canal';
+
+  @override
+  String get createChannelAction => 'Crear';
+
+  @override
+  String get channelCreateError => 'No se pudo crear el canal';
+
+  @override
   String get cancel => 'Cancelar';
 
   @override
