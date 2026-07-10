@@ -333,6 +333,15 @@ class ApiChatRepository extends ChatRepository {
       case 'voice.state':
         _voice[e.d['channelId'] as String] = _voiceUsers(e.d['members']);
         notifyListeners();
+      case 'presence':
+        final c = _activeCommunity;
+        if (c == null) return;
+        _activeCommunity = Community(
+          id: c.id, name: c.name, ownerId: c.ownerId, channels: c.channels, roles: c.roles,
+          members: [for (final m in c.members)
+            m.id == e.d['userId'] ? m.withOnline(e.d['online'] as bool? ?? false) : m],
+        );
+        notifyListeners();
       case 'community.updated' || 'community.deleted' || 'channel.created' ||
             'channel.updated' || 'channel.deleted' || 'role.created' || 'role.updated' ||
             'role.deleted' || 'member.joined' || 'member.left' || 'member.updated' ||

@@ -44,6 +44,8 @@
   "channelNameHint": "Nome do canal",
   "createChannelAction": "Criar",
   "channelCreateError": "Não foi possível criar o canal",
+  "membersOnline": "Online",
+  "membersOffline": "Offline",
   "cancel": "Cancelar",
   "navChats": "Conversas",
   "navGroups": "Grupos",

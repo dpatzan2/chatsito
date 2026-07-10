@@ -128,6 +128,12 @@ class SEn extends S {
   String get channelCreateError => 'Couldn\'t create the channel';
 
   @override
+  String get membersOnline => 'Online';
+
+  @override
+  String get membersOffline => 'Offline';
+
+  @override
   String get cancel => 'Cancel';
 
   @override

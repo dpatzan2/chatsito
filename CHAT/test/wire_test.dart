@@ -60,4 +60,16 @@ void main() {
     expect(k.voiceChannels.single.isVoice, true);
     expect(k.member('u1')!.name, 'Ana');
   });
+
+  test('communityFromWire mapea online', () {
+    final c = communityFromWire({
+      'id': 'c1', 'name': 'X', 'ownerId': 'u1',
+      'members': [
+        {'id': 'u1', 'phone': '50211111111', 'online': true},
+        {'id': 'u2', 'phone': '50222222222'},
+      ],
+    });
+    expect(c.members[0].online, true);
+    expect(c.members[1].online, false);
+  });
 }

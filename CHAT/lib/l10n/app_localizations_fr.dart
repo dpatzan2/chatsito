@@ -128,6 +128,12 @@ class SFr extends S {
   String get channelCreateError => 'Impossible de créer le salon';
 
   @override
+  String get membersOnline => 'En ligne';
+
+  @override
+  String get membersOffline => 'Hors ligne';
+
+  @override
   String get cancel => 'Annuler';
 
   @override

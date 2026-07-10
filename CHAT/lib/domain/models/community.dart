@@ -48,7 +48,12 @@ class Member {
   final String id, name;
   final Color color;
   final List<String> roleIds;
-  const Member({required this.id, required this.name, required this.color, this.roleIds = const []});
+  final bool online;
+  const Member({required this.id, required this.name, required this.color,
+      this.roleIds = const [], this.online = false});
+
+  Member withOnline(bool v) =>
+      Member(id: id, name: name, color: color, roleIds: roleIds, online: v);
 }
 
 class Community {

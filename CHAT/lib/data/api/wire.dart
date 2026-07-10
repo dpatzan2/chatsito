@@ -178,6 +178,7 @@ Community communityFromWire(Map<String, dynamic> j) {
           name: (m['displayName'] as String?) ?? formatPhone(m['phone'] as String),
           color: colorFromHex((m['avatarColor'] as String?) ?? '#7C5CFF'),
           roleIds: [for (final id in (m['roleIds'] as List? ?? const [])) id as String],
+          online: (m['online'] as bool?) ?? false,
         ),
     ],
   );
