@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../domain/models/message.dart';
@@ -38,7 +39,7 @@ class MessageBubble extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           mainAxisSize: MainAxisSize.min,
           children: [
-            _content(isMe),
+            _content(context, isMe),
             Padding(
               padding: EdgeInsets.only(top: (isMedia || isSticker) ? 4 : 2),
               child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -52,20 +53,44 @@ class MessageBubble extends StatelessWidget {
     );
   }
 
-  Widget _content(bool isMe) {
+  Widget _content(BuildContext context, bool isMe) {
     switch (message.type) {
       case MessageType.image:
-        return _media(icon: null, label: 'IMG · foto.jpg');
+        if (message.url == null) return _media(icon: null, label: 'IMG · foto.jpg');
+        return GestureDetector(
+          onTap: () => _openViewer(context),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(message.url!, width: 220, fit: BoxFit.cover,
+                loadingBuilder: (c, w, p) => p == null ? w
+                    : Container(width: 220, height: 148, color: const Color(0xFFCFD3DF))),
+          ),
+        );
       case MessageType.video:
         return _media(icon: Icons.play_arrow, label: '0:42');
       case MessageType.doc:
-        return _doc(isMe);
+        if (message.url == null) return _doc(isMe);
+        return GestureDetector(
+            onTap: () => launchUrl(Uri.parse(message.url!)), child: _doc(isMe));
       case MessageType.sticker:
         return Text(message.sticker ?? '', style: const TextStyle(fontSize: 78, height: 1));
       case MessageType.text:
         return Text(message.text ?? '', style: TextStyle(fontSize: 15, height: 1.4, color: isMe ? Colors.white : C.ink));
     }
   }
+
+  void _openViewer(BuildContext context) => showDialog(
+        context: context,
+        builder: (_) => Dialog.fullscreen(
+          backgroundColor: Colors.black,
+          child: Stack(children: [
+            Center(child: InteractiveViewer(child: Image.network(message.url!))),
+            Positioned(top: 40, right: 16,
+                child: IconButton(icon: const Icon(Icons.close, color: Colors.white),
+                    onPressed: () => Navigator.pop(context))),
+          ]),
+        ),
+      );
 
   Widget _media({IconData? icon, required String label}) {
     return ClipRRect(

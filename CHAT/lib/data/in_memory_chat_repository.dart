@@ -139,6 +139,14 @@ class InMemoryChatRepository extends ChatRepository {
   }
 
   @override
+  Future<void> sendFile(MessageType type, List<int> bytes, String filename, String mime) async {
+    _messages.add(type == MessageType.doc
+        ? Message.doc(Sender.me, docName: filename, docSize: '${(bytes.length / 1024).ceil()} KB', time: '9:41')
+        : Message.image(Sender.me, time: '9:41'));
+    notifyListeners();
+  }
+
+  @override
   Future<void> sendTyping() async {}
 
   @override

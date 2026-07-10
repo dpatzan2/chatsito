@@ -165,6 +165,9 @@ class SEs extends S {
   String get deleteAction => 'Eliminar';
 
   @override
+  String get uploadError => 'No se pudo subir el archivo';
+
+  @override
   String get cancel => 'Cancelar';
 
   @override

@@ -110,7 +110,7 @@ class ApiChatRepository extends ChatRepository {
     final r = await _api.send('GET', '/conversations/${c.id}/messages') as Map;
     _messages = [
       for (final m in (r['messages'] as List).reversed)
-        messageFromWire((m as Map).cast<String, dynamic>(), _me),
+        messageFromWire((m as Map).cast<String, dynamic>(), _me, baseUrl: _api.baseUrl),
     ];
     _oneToOnes = [for (final x in _oneToOnes) x.id == c.id ? x.copyWith(unread: 0) : x];
     notifyListeners();
@@ -149,7 +149,7 @@ class ApiChatRepository extends ChatRepository {
     final r = await _api.send('GET', '/channels/${ch.id}/messages') as Map;
     _messages = [
       for (final m in (r['messages'] as List).reversed)
-        messageFromWire((m as Map).cast<String, dynamic>(), _me),
+        messageFromWire((m as Map).cast<String, dynamic>(), _me, baseUrl: _api.baseUrl),
     ];
     notifyListeners();
     await _markRead({'channelId': ch.id});
@@ -221,6 +221,23 @@ class ApiChatRepository extends ChatRepository {
     _activeCommunity = null;
     await refresh();
   }
+
+  @override
+  Future<void> sendFile(MessageType type, List<int> bytes, String filename, String mime) async {
+    final up = await _api.upload(bytes, filename, mime);
+    final content = switch (type) {
+      MessageType.doc => {
+          'url': up['url'], 'name': up['name'],
+          'size': _humanSize(up['size'] as int), 'mime': mime,
+        },
+      _ => {'url': up['url'], 'mime': mime},
+    };
+    await _send(type.name, content);
+  }
+
+  String _humanSize(int bytes) => bytes < 1024 * 1024
+      ? '${(bytes / 1024).ceil()} KB'
+      : '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
 
   @override
   Future<void> createRole(String name, Color? color, BigInt permissions) async {
@@ -377,7 +394,7 @@ class ApiChatRepository extends ChatRepository {
             d['conversationId'] == _activeConversationId) ||
         (d['channelId'] != null && d['channelId'] == _activeChannelId);
     if (inActive) {
-      _messages = [..._messages, messageFromWire(d, _me)];
+      _messages = [..._messages, messageFromWire(d, _me, baseUrl: _api.baseUrl)];
       _peerTyping = false;
       notifyListeners();
       if (d['authorId'] != _me) {

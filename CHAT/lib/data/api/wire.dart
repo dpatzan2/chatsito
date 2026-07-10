@@ -90,28 +90,42 @@ String formatTime(DateTime t, {DateTime? now}) {
   return '${t.day}/${t.month}';
 }
 
-Message messageFromWire(Map<String, dynamic> m, String myUserId) {
+Message messageFromWire(Map<String, dynamic> m, String myUserId, {String baseUrl = ''}) {
   final sender = m['authorId'] == myUserId ? Sender.me : Sender.them;
   final id = m['id'] as String;
   final time = formatTime(DateTime.fromMillisecondsSinceEpoch(m['createdAt'] as int));
   final c = (m['content'] as Map).cast<String, dynamic>();
+  // solo adjuntos de nuestro /uploads: una url arbitraria de otro usuario
+  // acabaría en launchUrl/Image.network (file://, javascript:, tracking…)
+  final rawUrl = c['url'] as String?;
+  final url = rawUrl != null && rawUrl.startsWith('/uploads/') ? '$baseUrl$rawUrl' : null;
   return switch (m['type'] as String) {
     'text' => Message.text(sender, c['text'] as String? ?? '', id: id, time: time),
     'sticker' => Message.sticker(sender, c['sticker'] as String? ?? '', id: id, time: time),
-    'image' => Message.image(sender, id: id, time: time),
-    'video' => Message.video(sender, id: id, time: time),
+    'image' => Message.image(sender, id: id, time: time, url: url),
+    'video' => Message.video(sender, id: id, time: time, url: url),
     'doc' => Message.doc(sender,
-        docName: c['name'] as String?, docSize: c['size'] as String?, id: id, time: time),
+        docName: c['name'] as String?, docSize: c['size'] as String?, id: id, time: time, url: url),
     _ => Message.text(sender, wireStrings.msgFallback, id: id, time: time),
   };
+}
+
+/// El server guarda rutas relativas; el cliente pinta absolutas.
+String _stripBase(String url) {
+  final i = url.indexOf('/uploads/');
+  return i < 0 ? url : url.substring(i);
 }
 
 /// Content JSON para msg.send a partir de un mensaje local.
 Map<String, dynamic> wireContent(Message m) => switch (m.type) {
       MessageType.text => {'text': m.text ?? ''},
       MessageType.sticker => {'sticker': m.sticker ?? ''},
-      MessageType.doc => {'name': m.docName ?? wireStrings.docFallback, 'size': m.docSize ?? ''},
-      MessageType.image || MessageType.video => {},
+      MessageType.doc => {
+        'name': m.docName ?? wireStrings.docFallback, 'size': m.docSize ?? '',
+        if (m.url != null) 'url': _stripBase(m.url!),
+      },
+      MessageType.image || MessageType.video =>
+        m.url == null ? {} : {'url': _stripBase(m.url!)},
     };
 
 /// Texto corto para la lista de chats.

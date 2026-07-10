@@ -84,14 +84,8 @@ class ChatController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> sendAttachment(MessageType type) async {
-    final m = switch (type) {
-      MessageType.image => const Message.image(Sender.me, time: '9:41'),
-      MessageType.video => const Message.video(Sender.me, time: '9:41'),
-      MessageType.doc => const Message.doc(Sender.me, docName: 'Informe_final.pdf', docSize: '1,8 MB · PDF', time: '9:41'),
-      _ => null,
-    };
-    if (m != null) await _chat.sendMessage(m);
+  Future<void> sendFile(MessageType type, List<int> bytes, String name, String mime) async {
+    await _chat.sendFile(type, bytes, name, mime);
     attachOpen = false;
     notifyListeners();
   }
